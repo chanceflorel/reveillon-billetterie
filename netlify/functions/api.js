@@ -57,7 +57,7 @@ async function handle(event) {
     });
   }
 
-  // 1. Contrôle du code d'accès commun pour tout le reste
+  // Contrôle du code d'accès commun pour tout le reste
   const expected = (process.env.ACCESS_CODE || "").trim();
   const given = (event.headers["x-access-code"] || "").trim();
   if (!expected || given !== expected) {
@@ -123,6 +123,18 @@ async function handle(event) {
       return reply(200, { status: "used", ticket: pub(current.data) });
     }
     return reply(200, { status: "valid", ticket: pub(updated) });
+  }
+
+  // Remise à zéro complète (billets et vendeurs) : demande la confirmation "EFFACER"
+  if (action === "reset") {
+    if (body.confirm !== "EFFACER") {
+      return reply(400, { error: "Confirmation manquante." });
+    }
+    for (const prefix of ["t/", "v/"]) {
+      const { blobs } = await store.list({ prefix });
+      await Promise.all(blobs.map((b) => store.delete(b.key)));
+    }
+    return reply(200, { ok: true });
   }
 
   // Statistiques partagées : tous les vendeurs connectés et toutes les ventes
