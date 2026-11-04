@@ -125,10 +125,12 @@ async function handle(event) {
     return reply(200, { status: "valid", ticket: pub(updated) });
   }
 
-  // Remise à zéro complète (billets et vendeurs) : demande la confirmation "EFFACER"
+  // Remise à zéro : protégée par le code RESET_CODE (variable Netlify), vérifié côté serveur
   if (action === "reset") {
-    if (body.confirm !== "EFFACER") {
-      return reply(400, { error: "Confirmation manquante." });
+    const expectedReset = (process.env.RESET_CODE || "").trim();
+    const givenReset = String(body.resetCode || "").trim();
+    if (!expectedReset || givenReset !== expectedReset) {
+      return reply(403, { error: "Code de remise à zéro incorrect." });
     }
     for (const prefix of ["t/", "v/"]) {
       const { blobs } = await store.list({ prefix });
