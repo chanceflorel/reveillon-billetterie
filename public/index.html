@@ -78,7 +78,6 @@ tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
 .sheet{position:fixed;inset:0;background:#000b;z-index:8;display:flex;align-items:flex-end;justify-content:center}
 .sheet-card{width:100%;max-width:640px;max-height:86vh;overflow:auto;background:var(--panel);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}
 @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
-.logout{margin-top:6px}
 </style>
 </head>
 <body>
@@ -161,7 +160,8 @@ tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
         </div>
         <div class="tblwrap"><table id="sellers"></table></div>
       </div>
-      <button class="btn ghost logout" id="logout">Changer de vendeur</button>
+      <button class="btn ghost" id="openSellers">Voir tous les vendeurs</button>
+      <button class="btn ghost" id="reset" style="margin-top:10px">Remettre le tableau à zéro</button>
     </section>
 
     <!-- SCANNER -->
@@ -173,6 +173,9 @@ tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
           <div class="frame"></div>
         </div>
         <p id="camMsg" class="hint">Pointez la caméra vers le QR code du billet.</p>
+        <label class="btn ghost" style="margin-top:12px">Prendre une photo du QR code
+          <input type="file" id="photo" accept="image/*" capture="environment" hidden>
+        </label>
       </div>
       <form id="manForm" class="card">
         <label>Ou saisir le code manuellement
@@ -198,6 +201,17 @@ tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
       <button class="chip" id="closeHist">Fermer</button>
     </div>
     <div id="histList"></div>
+  </div>
+</div>
+
+<!-- TOUS LES VENDEURS -->
+<div id="sellersSheet" class="sheet" hidden>
+  <div class="sheet-card">
+    <div class="sec-head">
+      <h2>Tous les vendeurs</h2>
+      <button class="chip" id="closeSellers">Fermer</button>
+    </div>
+    <div id="sellersList"></div>
   </div>
 </div>
 
@@ -283,11 +297,6 @@ $("#loginForm").onsubmit = async (e) => {
     msg.textContent = err.message;
     msg.hidden = false;
   }
-};
-
-$("#logout").onclick = () => {
-  localStorage.removeItem("rv-session");
-  location.href = location.pathname;
 };
 
 /* ---------- VÉRIFICATION DU BILLET ---------- */
@@ -550,8 +559,10 @@ function renderStats(s) {
     </tr></tfoot>`;
 
   if (!$("#hist").hidden) renderHist();
+  if (!$("#sellersSheet").hidden) renderSellers();
 }
 
+/* ---------- HISTORIQUE ---------- */
 $("#openHist").onclick = () => { renderHist(); $("#hist").hidden = false; };
 $("#closeHist").onclick = () => { $("#hist").hidden = true; };
 
@@ -570,15 +581,52 @@ function renderHist() {
     : `<p class="hint">Aucune vente pour l'instant.</p>`;
 }
 
-$("#logout").onclick = $("#logout").onclick;
+/* ---------- TOUS LES VENDEURS ---------- */
+$("#openSellers").onclick = () => { renderSellers(); $("#sellersSheet").hidden = false; };
+$("#closeSellers").onclick = () => { $("#sellersSheet").hidden = true; };
+
+function renderSellers() {
+  const list = lastStats?.vendeurs || [];
+  $("#sellersList").innerHTML = list.length
+    ? list.map((v) => `
+        <div style="padding:12px 0;border-bottom:1px solid #ffffff10">
+          <div class="row" style="padding:0;border:0">
+            <b>${esc(v.vendeur)}</b>
+            <span style="color:var(--gold2);font-size:14px">${MAD(v.montant)}</span>
+          </div>
+          <div style="color:var(--mut);font-size:13px;margin-top:4px">
+            ${fmt(v.vendus)} billet${v.vendus > 1 ? "s" : ""} · ${fmt(v.envoyes)} envoyé${v.envoyes > 1 ? "s" : ""} · ${fmt(v.entrees)} entrée${v.entrees > 1 ? "s" : ""}
+          </div>
+        </div>`).join("")
+    : `<p class="hint">Aucun vendeur pour l'instant.</p>`;
+}
+
+/* ---------- REMISE À ZÉRO ---------- */
+$("#reset").onclick = async () => {
+  if (!confirm("Effacer TOUTES les ventes et tous les vendeurs ? Cette action est irréversible.")) return;
+  const word = prompt("Pour confirmer, tapez EFFACER :");
+  if (word !== "EFFACER") return;
+  try {
+    await api("reset", { confirm: word });
+    lastStats = null;
+    loadStats();
+    alert("Tableau remis à zéro.");
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
 /* ---------- SCANNER ---------- */
 let stream = null, scanning = false, busy = false, raf = null;
 
 async function startCam() {
   if (scanning) return;
+  if (!navigator.mediaDevices?.getUserMedia) {
+    $("#camMsg").textContent = "Caméra non disponible ici. Ouvrez le site dans Chrome ou Safari, ou utilisez « Prendre une photo » ci-dessous.";
+    return;
+  }
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
     const v = $("#vid");
     v.srcObject = stream;
     await v.play();
@@ -586,7 +634,13 @@ async function startCam() {
     $("#camMsg").textContent = "Pointez la caméra vers le QR code du billet.";
     tick();
   } catch (err) {
-    $("#camMsg").textContent = "Caméra indisponible : saisissez le code ci-dessous.";
+    const raisons = {
+      NotAllowedError: "accès refusé (autorisez la caméra dans les réglages du navigateur)",
+      NotFoundError: "aucune caméra trouvée",
+      NotReadableError: "caméra utilisée par une autre application",
+      OverconstrainedError: "caméra arrière indisponible",
+    };
+    $("#camMsg").textContent = "Caméra indisponible : " + (raisons[err.name] || err.name) + ". Utilisez « Prendre une photo » ci-dessous.";
   }
 }
 
@@ -659,6 +713,27 @@ $("#manForm").onsubmit = async (e) => {
   const code = extractCode($("#manCode").value);
   $("#manCode").value = "";
   showResult(await validate(code));
+};
+
+$("#photo").onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = async () => {
+    const c = $("#cv"), ctx = c.getContext("2d", { willReadFrequently: true });
+    c.width = img.width;
+    c.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height);
+    const q = jsQR(d.data, d.width, d.height, { inversionAttempts: "attemptBoth" });
+    e.target.value = "";
+    if (!q) {
+      showResult({ status: "error", msg: "QR code illisible sur cette photo. Reprenez-la plus près, bien droite, avec de la lumière." });
+      return;
+    }
+    showResult(await validate(extractCode(q.data)));
+  };
+  img.src = URL.createObjectURL(file);
 };
 
 /* ---------- DÉMARRAGE ---------- */
