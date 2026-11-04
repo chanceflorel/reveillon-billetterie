@@ -1,13 +1,11 @@
 const crypto = require("crypto");
 
-
 const HEADERS = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const reply = (statusCode, body) => ({ statusCode, headers: HEADERS, body: JSON.stringify(body) });
 
-const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sans caractères ambigus
+const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode = () => Array.from(crypto.randomBytes(10), (b) => CHARS[b % CHARS.length]).join("");
 
-// Ce qui peut être montré à l'écran (le numéro de téléphone reste privé)
 const pub = (t) => ({
   code: t.code,
   nom: t.nom,
@@ -24,7 +22,15 @@ async function getStore() {
 }
 
 exports.handler = async (event) => {
-  // 1. Contrôle du code d'accès commun
+  try {
+    return await handle(event);
+  } catch (err) {
+    console.error("Erreur fonction :", err);
+    return reply(500, { error: "Erreur serveur : " + err.message });
+  }
+};
+
+async function handle(event) {
   const expected = (process.env.ACCESS_CODE || "").trim();
   const given = (event.headers["x-access-code"] || "").trim();
   if (!expected || given !== expected) {
@@ -42,12 +48,10 @@ exports.handler = async (event) => {
 
   const store = await getStore();
 
-  // Vérifier le code (utilisé à la connexion)
   if (action === "check") {
     return reply(200, { ok: true });
   }
 
-  // Créer un billet après paiement en espèces
   if (action === "create") {
     const nom = String(body.nom || "").trim().slice(0, 80);
     const tel = String(body.tel || "").replace(/\D/g, "");
@@ -69,7 +73,6 @@ exports.handler = async (event) => {
     return reply(200, { ticket: pub(ticket) });
   }
 
-  // Marquer un billet comme envoyé au client
   if (action === "sent") {
     const code = String(body.code || "").toUpperCase();
     const ticket = await store.get("t/" + code, { type: "json" });
@@ -79,8 +82,6 @@ exports.handler = async (event) => {
     return reply(200, { ok: true });
   }
 
-  // Valider l'entrée : un billet ne peut être validé qu'une seule fois,
-  // même si plusieurs scanners le lisent en même temps (écriture conditionnelle par etag)
   if (action === "validate") {
     const code = String(body.code || "").toUpperCase();
     if (!/^[A-Z2-9]{10}$/.test(code)) return reply(200, { status: "invalid" });
@@ -94,13 +95,11 @@ exports.handler = async (event) => {
     try {
       await store.setJSON(key, updated, { onlyIfMatch: current.etag });
     } catch {
-      // Un autre scanner vient de le valider une seconde avant
       return reply(200, { status: "used", ticket: pub(current.data) });
     }
     return reply(200, { status: "valid", ticket: pub(updated) });
   }
 
-  // Statistiques partagées pour le tableau de bord
   if (action === "stats") {
     const { blobs } = await store.list({ prefix: "t/" });
     const tickets = (await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" })))).filter(Boolean);
@@ -134,4 +133,4 @@ exports.handler = async (event) => {
   }
 
   return reply(404, { error: "Action inconnue." });
-};
+}
