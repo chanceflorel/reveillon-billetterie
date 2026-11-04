@@ -3,21 +3,21 @@ const crypto = require("crypto");
 const HEADERS = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const reply = (statusCode, body) => ({ statusCode, headers: HEADERS, body: JSON.stringify(body) });
 
-const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sans caractères ambigus
+const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode = () => Array.from(crypto.randomBytes(10), (b) => CHARS[b % CHARS.length]).join("");
+const priceOf = (t) => Number(t.prix) || 0;
 
 // Ce qui peut être montré à l'écran (le numéro de téléphone reste privé)
 const pub = (t) => ({
   code: t.code,
   nom: t.nom,
   vendeur: t.vendeur,
-  prix: Number(t.prix) || 0,
+  prix: priceOf(t),
   cree: t.cree,
   envoye: !!t.envoye,
   utilise: t.utilise || null,
 });
 
-// Connexion au stockage Netlify Blobs
 async function getStore(event) {
   const blobs = await import("@netlify/blobs");
   blobs.connectLambda(event);
@@ -34,13 +34,6 @@ exports.handler = async (event) => {
 };
 
 async function handle(event) {
-  // 1. Contrôle du code d'accès commun
-  const expected = (process.env.ACCESS_CODE || "").trim();
-  const given = (event.headers["x-access-code"] || "").trim();
-  if (!expected || given !== expected) {
-    return reply(401, { error: "Code d'accès incorrect." });
-  }
-
   const action = (event.path || "").split("/").filter(Boolean).pop();
 
   let body = {};
@@ -52,8 +45,31 @@ async function handle(event) {
 
   const store = await getStore(event);
 
-  // Vérifier le code (utilisé à la connexion)
+  // Vérification publique d'un billet (QR code) : aucun code d'accès, ne consomme rien
+  if (action === "verify") {
+    const code = String((event.queryStringParameters || {}).code || "").toUpperCase();
+    if (!/^[A-Z2-9]{10}$/.test(code)) return reply(200, { status: "invalid" });
+    const t = await store.get("t/" + code, { type: "json" });
+    if (!t) return reply(200, { status: "invalid" });
+    return reply(200, {
+      status: t.utilise ? "used" : "valid",
+      ticket: { code: t.code, nom: t.nom, vendeur: t.vendeur, prix: priceOf(t) },
+    });
+  }
+
+  // 1. Contrôle du code d'accès commun pour tout le reste
+  const expected = (process.env.ACCESS_CODE || "").trim();
+  const given = (event.headers["x-access-code"] || "").trim();
+  if (!expected || given !== expected) {
+    return reply(401, { error: "Code d'accès incorrect." });
+  }
+
+  // Connexion : enregistre le vendeur pour qu'il apparaisse dans le tableau, même sans vente
   if (action === "check") {
+    const name = String(body.vendeur || "").trim().slice(0, 40);
+    if (name) {
+      await store.setJSON("v/" + encodeURIComponent(name), { vendeur: name, vu: new Date().toISOString() });
+    }
     return reply(200, { ok: true });
   }
 
@@ -103,41 +119,48 @@ async function handle(event) {
     try {
       await store.setJSON(key, updated, { onlyIfMatch: current.etag });
     } catch {
-      // Un autre scanner vient de le valider une seconde avant
+      // Un autre scanner vient de valider ce billet une seconde avant
       return reply(200, { status: "used", ticket: pub(current.data) });
     }
     return reply(200, { status: "valid", ticket: pub(updated) });
   }
 
-  // Statistiques partagées pour le tableau de bord
+  // Statistiques partagées : tous les vendeurs connectés et toutes les ventes
   if (action === "stats") {
-    const { blobs } = await store.list({ prefix: "t/" });
-    const tickets = (await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" })))).filter(Boolean);
+    const ticketList = await store.list({ prefix: "t/" });
+    const tickets = (await Promise.all(ticketList.blobs.map((b) => store.get(b.key, { type: "json" })))).filter(Boolean);
+
+    const sellerList = await store.list({ prefix: "v/" });
+    const registered = (await Promise.all(sellerList.blobs.map((b) => store.get(b.key, { type: "json" })))).filter(Boolean);
 
     const sellers = {};
+    const ensure = (name) => (sellers[name] ??= { vendeur: name, vendus: 0, montant: 0, envoyes: 0, entrees: 0 });
+
+    for (const v of registered) ensure(v.vendeur);
+
     let sent = 0;
     let used = 0;
+    let total = 0;
     for (const t of tickets) {
-      const name = t.vendeur || "Sans nom";
-      sellers[name] ??= { vendeur: name, vendus: 0, envoyes: 0, entrees: 0, recettes: 0 };
-      const s = sellers[name];
+      const s = ensure(t.vendeur || "Sans nom");
       s.vendus++;
-      s.recettes += Number(t.prix) || 0;
+      s.montant += priceOf(t);
+      total += priceOf(t);
       if (t.envoye) { s.envoyes++; sent++; }
       if (t.utilise) { s.entrees++; used++; }
     }
 
     const recent = [...tickets]
       .sort((a, b) => String(b.cree).localeCompare(String(a.cree)))
-      .slice(0, 30)
+      .slice(0, 500)
       .map(pub);
 
     return reply(200, {
       total: tickets.length,
+      montant: total,
       envoyes: sent,
       entrees: used,
-      recettes: tickets.reduce((sum, t) => sum + (Number(t.prix) || 0), 0),
-      vendeurs: Object.values(sellers).sort((a, b) => b.vendus - a.vendus),
+      vendeurs: Object.values(sellers).sort((a, b) => b.montant - a.montant || a.vendeur.localeCompare(b.vendeur)),
       recent,
     });
   }
