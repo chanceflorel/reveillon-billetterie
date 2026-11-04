@@ -17,11 +17,11 @@ const pub = (t) => ({
   utilise: t.utilise || null,
 });
 
-// Connexion au stockage Netlify Blobs (connectLambda est obligatoire avec exports.handler)
+// Connexion au stockage Netlify Blobs
 async function getStore(event) {
   const blobs = await import("@netlify/blobs");
   blobs.connectLambda(event);
-  return blobs.getStore({ name: "reveillon", consistency: "strong" });
+  return blobs.getStore({ name: "reveillon" });
 }
 
 exports.handler = async (event) => {
@@ -50,11 +50,12 @@ async function handle(event) {
     return reply(400, { error: "Requête invalide." });
   }
 
- async function getStore(event) {
-  const blobs = await import("@netlify/blobs");
-  blobs.connectLambda(event);
-  return blobs.getStore({ name: "reveillon" });
-}
+  const store = await getStore(event);
+
+  // Vérifier le code (utilisé à la connexion)
+  if (action === "check") {
+    return reply(200, { ok: true });
+  }
 
   // Créer un billet après paiement en espèces
   if (action === "create") {
@@ -88,8 +89,7 @@ async function handle(event) {
     return reply(200, { ok: true });
   }
 
-  // Valider l'entrée : un billet ne peut être validé qu'une seule fois,
-  // même si plusieurs scanners le lisent en même temps (écriture conditionnelle par etag)
+  // Valider l'entrée : un billet ne peut être validé qu'une seule fois
   if (action === "validate") {
     const code = String(body.code || "").toUpperCase();
     if (!/^[A-Z2-9]{10}$/.test(code)) return reply(200, { status: "invalid" });
