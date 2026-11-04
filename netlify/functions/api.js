@@ -3,9 +3,10 @@ const crypto = require("crypto");
 const HEADERS = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const reply = (statusCode, body) => ({ statusCode, headers: HEADERS, body: JSON.stringify(body) });
 
-const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sans caractères ambigus
 const newCode = () => Array.from(crypto.randomBytes(10), (b) => CHARS[b % CHARS.length]).join("");
 
+// Ce qui peut être montré à l'écran (le numéro de téléphone reste privé)
 const pub = (t) => ({
   code: t.code,
   nom: t.nom,
@@ -16,9 +17,11 @@ const pub = (t) => ({
   utilise: t.utilise || null,
 });
 
-async function getStore() {
-  const { getStore } = await import("@netlify/blobs");
-  return getStore({ name: "reveillon", consistency: "strong" });
+// Connexion au stockage Netlify Blobs (connectLambda est obligatoire avec exports.handler)
+async function getStore(event) {
+  const blobs = await import("@netlify/blobs");
+  blobs.connectLambda(event);
+  return blobs.getStore({ name: "reveillon", consistency: "strong" });
 }
 
 exports.handler = async (event) => {
@@ -31,6 +34,7 @@ exports.handler = async (event) => {
 };
 
 async function handle(event) {
+  // 1. Contrôle du code d'accès commun
   const expected = (process.env.ACCESS_CODE || "").trim();
   const given = (event.headers["x-access-code"] || "").trim();
   if (!expected || given !== expected) {
@@ -46,12 +50,14 @@ async function handle(event) {
     return reply(400, { error: "Requête invalide." });
   }
 
-  const store = await getStore();
+  const store = await getStore(event);
 
+  // Vérifier le code (utilisé à la connexion)
   if (action === "check") {
     return reply(200, { ok: true });
   }
 
+  // Créer un billet après paiement en espèces
   if (action === "create") {
     const nom = String(body.nom || "").trim().slice(0, 80);
     const tel = String(body.tel || "").replace(/\D/g, "");
@@ -73,6 +79,7 @@ async function handle(event) {
     return reply(200, { ticket: pub(ticket) });
   }
 
+  // Marquer un billet comme envoyé au client
   if (action === "sent") {
     const code = String(body.code || "").toUpperCase();
     const ticket = await store.get("t/" + code, { type: "json" });
@@ -82,6 +89,8 @@ async function handle(event) {
     return reply(200, { ok: true });
   }
 
+  // Valider l'entrée : un billet ne peut être validé qu'une seule fois,
+  // même si plusieurs scanners le lisent en même temps (écriture conditionnelle par etag)
   if (action === "validate") {
     const code = String(body.code || "").toUpperCase();
     if (!/^[A-Z2-9]{10}$/.test(code)) return reply(200, { status: "invalid" });
@@ -95,11 +104,13 @@ async function handle(event) {
     try {
       await store.setJSON(key, updated, { onlyIfMatch: current.etag });
     } catch {
+      // Un autre scanner vient de le valider une seconde avant
       return reply(200, { status: "used", ticket: pub(current.data) });
     }
     return reply(200, { status: "valid", ticket: pub(updated) });
   }
 
+  // Statistiques partagées pour le tableau de bord
   if (action === "stats") {
     const { blobs } = await store.list({ prefix: "t/" });
     const tickets = (await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" })))).filter(Boolean);
