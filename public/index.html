@@ -25,6 +25,8 @@ h1,h2{font-family:"Playfair Display",Georgia,serif;margin:0;font-weight:700}
 .hero p{color:var(--mut);margin:6px 0 0;font-size:14px}
 .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid #ffffff14;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 32px #0007}
 .card h2{font-size:20px;margin-bottom:14px}
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.sec-head h2{font-size:20px}
 label{display:block;font-size:13px;color:var(--mut);margin-bottom:14px}
 input,select{display:block;width:100%;margin-top:6px;padding:13px 14px;border-radius:12px;border:1px solid #ffffff1f;background:#0e0e22;color:var(--txt);font:inherit;font-size:16px;appearance:none}
 input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
@@ -33,21 +35,26 @@ input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
 .btn.wa{background:#25d366;color:#04230f}
 .btn:disabled{opacity:.5;cursor:default}
 .btn+.btn{margin-top:10px}
+.chip{background:#ffffff14;color:var(--gold2);border:1px solid #d4af3740;border-radius:99px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer}
 .tabs{position:fixed;bottom:0;left:0;right:0;display:flex;gap:6px;background:#0e0e22e6;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid #ffffff14;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:5}
 .tabs button{flex:1;background:none;border:0;color:var(--mut);font:500 12px Inter,sans-serif;padding:8px 4px;border-radius:12px;cursor:pointer}
 .tabs button .ic{display:block;font-size:20px;margin-bottom:2px}
 .tabs button.on{color:var(--gold);background:#d4af3718}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .kpi{background:linear-gradient(180deg,#ffffff12,#ffffff06);border:1px solid #ffffff12;border-radius:16px;padding:16px}
-.kpi b{display:block;font-family:"Playfair Display",serif;font-size:30px;color:var(--gold2)}
+.kpi b{display:block;font-family:"Playfair Display",serif;font-size:26px;color:var(--gold2)}
 .kpi span{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:10px 6px;border-bottom:1px solid #ffffff10;text-align:left}
+th{color:var(--mut);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.n{text-align:right;white-space:nowrap}
+tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #ffffff10;font-size:14px}
 .row:last-child{border-bottom:0}
 .pill{font-size:11px;padding:4px 10px;border-radius:99px;background:#ffffff14;color:var(--mut);white-space:nowrap}
 .pill.ok{background:#22c55e22;color:#86efac}
 .pill.gold{background:#d4af3726;color:var(--gold2)}
-.bar{height:7px;border-radius:99px;background:#ffffff14;overflow:hidden;margin-top:8px}
-.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s ease}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;color:var(--gold2)}
 .hint{color:var(--mut);font-size:13px;text-align:center;margin:10px 0 0}
 .msg{padding:11px 13px;border-radius:12px;font-size:14px;margin-top:6px}
@@ -57,19 +64,35 @@ input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
 .camwrap{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1/1}
 .camwrap video{width:100%;height:100%;object-fit:cover}
 .frame{position:absolute;inset:16%;border:2px solid var(--gold);border-radius:20px;box-shadow:0 0 0 999px #0009}
-.result{position:fixed;inset:0;display:grid;place-items:center;background:#000b;z-index:10;padding:24px}
-.resbox{width:min(92vw,380px);border-radius:24px;padding:30px 24px;text-align:center;color:#fff;box-shadow:0 20px 60px #000a;animation:pop .25s ease}
+.resbox{border-radius:24px;padding:28px 22px;text-align:center;color:#fff;box-shadow:0 20px 60px #000a}
+.resbox.inline{box-shadow:none;margin:0 0 14px}
 .resbox.ok{background:linear-gradient(160deg,#16a34a,#15803d)}
 .resbox.warn{background:linear-gradient(160deg,#f59e0b,#b45309)}
 .resbox.ko,.resbox.error{background:linear-gradient(160deg,#ef4444,#b91c1c)}
 .resbox .ico{width:64px;height:64px;margin:0 auto 12px;border-radius:50%;background:#ffffff26;display:grid;place-items:center;font-size:30px;font-weight:700}
 .resbox h2{font-size:24px;margin-bottom:8px}
-.resbox p{margin:0;opacity:.9}
+.resbox p{margin:0;opacity:.92}
+.resbox .vt{margin-top:12px;font-size:15px;opacity:.95}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;background:#000b;z-index:10;padding:24px}
+.overlay .resbox{width:min(92vw,380px);animation:pop .25s ease}
+.sheet{position:fixed;inset:0;background:#000b;z-index:8;display:flex;align-items:flex-end;justify-content:center}
+.sheet-card{width:100%;max-width:640px;max-height:86vh;overflow:auto;background:var(--panel);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}
 @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
 .logout{margin-top:6px}
 </style>
 </head>
 <body>
+
+<!-- VÉRIFICATION D'UN BILLET (ouverte par le QR code, sans connexion requise) -->
+<section id="verify" class="wrap" hidden>
+  <div class="hero">
+    <div class="moon">🥂</div>
+    <h1>Vérification</h1>
+    <p>Coup de minuit · 31 décembre</p>
+  </div>
+  <div class="card" id="vBody"></div>
+  <button class="btn ghost" id="vBack">Retour à l'application</button>
+</section>
 
 <!-- CONNEXION -->
 <section id="login" class="wrap" hidden>
@@ -101,7 +124,7 @@ input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
     </div>
 
     <!-- VENDRE -->
-    <section id="p-sell" class="panel">
+    <section id="p-sell">
       <form id="sellForm" class="card">
         <h2>Vendre un billet</h2>
         <label>Nom du client
@@ -129,21 +152,20 @@ input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
     </section>
 
     <!-- TABLEAU DE BORD -->
-    <section id="p-dash" class="panel" hidden>
+    <section id="p-dash" hidden>
       <div class="kpis" id="kpis"></div>
       <div class="card">
-        <h2>Par vendeur</h2>
-        <div id="sellers"></div>
-      </div>
-      <div class="card">
-        <h2>Dernières ventes</h2>
-        <div id="recent"></div>
+        <div class="sec-head">
+          <h2>Tous les vendeurs</h2>
+          <button class="chip" id="openHist">Historique</button>
+        </div>
+        <div class="tblwrap"><table id="sellers"></table></div>
       </div>
       <button class="btn ghost logout" id="logout">Changer de vendeur</button>
     </section>
 
     <!-- SCANNER -->
-    <section id="p-scan" class="panel" hidden>
+    <section id="p-scan" hidden>
       <div class="card" style="padding:12px">
         <div class="camwrap">
           <video id="vid" playsinline muted></video>
@@ -156,7 +178,7 @@ input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
         <label>Ou saisir le code manuellement
           <input id="manCode" maxlength="16" autocomplete="off" style="text-transform:uppercase">
         </label>
-        <button class="btn ghost">Vérifier le billet</button>
+        <button class="btn ghost">Valider le billet</button>
       </form>
     </section>
   </div>
@@ -166,30 +188,52 @@ input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
     <button data-tab="dash"><span class="ic">📊</span>Tableau de bord</button>
     <button data-tab="scan"><span class="ic">📷</span>Scanner</button>
   </nav>
-
-  <div id="res" class="result" hidden>
-    <div class="resbox">
-      <div class="ico"></div>
-      <h2></h2>
-      <p></p>
-    </div>
-  </div>
 </main>
+
+<!-- HISTORIQUE -->
+<div id="hist" class="sheet" hidden>
+  <div class="sheet-card">
+    <div class="sec-head">
+      <h2>Historique des ventes</h2>
+      <button class="chip" id="closeHist">Fermer</button>
+    </div>
+    <div id="histList"></div>
+  </div>
+</div>
+
+<!-- RÉSULTAT DU SCANNER -->
+<div id="res" class="overlay" hidden>
+  <div class="resbox">
+    <div class="ico"></div>
+    <h2></h2>
+    <p></p>
+  </div>
+</div>
 
 <script>
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+const fmt = (n) => Number(n).toLocaleString("fr-FR");
+const MAD = (n) => fmt(n) + " MAD";
 const EV = { name: "Coup de minuit", date: "31 décembre", place: "Après la messe" };
 
 let session = JSON.parse(localStorage.getItem("rv-session") || "null");
-const MAD = (n) => Number(n).toLocaleString("fr-FR") + " MAD";
 let fresh = [];
+let lastStats = null;
 let poll = null;
 let resT = null;
+let verifyCode = null;
+
+const params = new URLSearchParams(location.search);
+const verifyParam = params.get("v");
+if (verifyParam) {
+  verifyCode = verifyParam.trim().toUpperCase();
+  history.replaceState(null, "", location.pathname);
+}
 
 /* ---------- API ---------- */
-async function api(action, body) {
-  const r = await fetch("/api/" + action, {
+async function api(path, body) {
+  const r = await fetch("/api/" + path, {
     method: body ? "POST" : "GET",
     headers: { "Content-Type": "application/json", "x-access-code": session?.code || "" },
     body: body ? JSON.stringify(body) : undefined,
@@ -199,18 +243,41 @@ async function api(action, body) {
   return data;
 }
 
-/* ---------- CONNEXION ---------- */
-function showLogin() { $("#login").hidden = false; $("#app").hidden = true; }
+/* ---------- ÉCRANS ---------- */
+function hideAll() {
+  ["#verify", "#login", "#app"].forEach((s) => ($(s).hidden = true));
+}
 
+function showLogin() {
+  hideAll();
+  $("#login").hidden = false;
+}
+
+function afterLogin() {
+  if (verifyCode) showVerify(verifyCode);
+  else start();
+}
+
+function start() {
+  hideAll();
+  $("#app").hidden = false;
+  $("#who").textContent = `Vendeur : ${session.vendeur}`;
+  go("sell");
+  loadStats();
+  clearInterval(poll);
+  poll = setInterval(() => { if (!$("#p-dash").hidden) loadStats(); }, 5000);
+}
+
+/* ---------- CONNEXION ---------- */
 $("#loginForm").onsubmit = async (e) => {
   e.preventDefault();
   const msg = $("#loginMsg");
   msg.hidden = true;
   session = { code: $("#inCode").value.trim(), vendeur: $("#inVendeur").value.trim() };
   try {
-    await api("check");
+    await api("check", { vendeur: session.vendeur });
     localStorage.setItem("rv-session", JSON.stringify(session));
-    start();
+    afterLogin();
   } catch (err) {
     session = null;
     msg.textContent = err.message;
@@ -223,24 +290,65 @@ $("#logout").onclick = () => {
   location.href = location.pathname;
 };
 
-function start() {
-  $("#login").hidden = true;
-  $("#app").hidden = false;
-  $("#who").textContent = `Vendeur : ${session.vendeur}`;
-  loadStats();
-  clearInterval(poll);
-  poll = setInterval(() => { if (!$("#p-dash").hidden) loadStats(); }, 5000);
+/* ---------- VÉRIFICATION DU BILLET ---------- */
+async function showVerify(code) {
+  verifyCode = code;
+  hideAll();
+  $("#verify").hidden = false;
+  $("#vBody").innerHTML = `<p class="hint">Vérification du billet…</p>`;
+  let r;
+  try {
+    r = await api("verify?code=" + encodeURIComponent(code));
+  } catch (err) {
+    r = { status: "error", msg: err.message };
+  }
+  renderVerify(r, false);
+}
 
-  // Ouverture depuis le QR code d'un billet : vérification directe
-  const v = new URLSearchParams(location.search).get("v");
-  if (v) {
-    history.replaceState(null, "", location.pathname);
-    go("scan");
-    validate(extractCode(v));
-  } else {
-    go("sell");
+function resultFor(r, validated) {
+  switch (r.status) {
+    case "valid":
+      return { kind: "ok", icon: "✓", title: "Billet authentique", sub: validated ? "Entrée validée" : "Billet valide, entrée non encore validée" };
+    case "used":
+      return { kind: "warn", icon: "!", title: "Billet déjà utilisé", sub: "Ce billet a déjà été scanné" };
+    case "invalid":
+      return { kind: "ko", icon: "✕", title: "Billet non authentique", sub: "Ce code ne correspond à aucun billet" };
+    default:
+      return { kind: "error", icon: "…", title: "Erreur", sub: r.msg || "Une erreur est survenue." };
   }
 }
+
+function renderVerify(r, validated) {
+  const res = resultFor(r, validated);
+  const t = r.ticket;
+  let action = "";
+  if (r.status === "valid" && !validated) {
+    action = session
+      ? `<button class="btn" id="vValidate">Valider l'entrée</button>`
+      : `<button class="btn" id="vLogin">Connexion vendeur pour valider</button>`;
+  }
+  $("#vBody").innerHTML = `
+    <div class="resbox inline ${res.kind}">
+      <div class="ico">${res.icon}</div>
+      <h2>${res.title}</h2>
+      <p>${esc(res.sub)}</p>
+      ${t ? `<div class="vt"><b>${esc(t.nom)}</b><br>${MAD(t.prix)} · vendu par ${esc(t.vendeur)}</div>` : ""}
+    </div>
+    ${action}`;
+}
+
+$("#vBody").onclick = async (e) => {
+  if (e.target.closest("#vLogin")) return showLogin();
+  const b = e.target.closest("#vValidate");
+  if (!b) return;
+  b.disabled = true;
+  b.textContent = "Validation…";
+  const r = await validate(verifyCode);
+  renderVerify(r, true);
+  loadStats();
+};
+
+$("#vBack").onclick = () => { location.href = location.pathname; };
 
 /* ---------- ONGLETS ---------- */
 function go(tab) {
@@ -266,6 +374,7 @@ $("#sellForm").onsubmit = async (e) => {
   const n = Number($("#cN").value);
   const prix = Number($("#cPrix").value);
   if (!(prix > 0)) return msg("sellMsg", "Indiquez le prix du billet.", "err");
+
   const btn = $("#sellBtn");
   btn.disabled = true;
   btn.textContent = "Création…";
@@ -293,7 +402,7 @@ function renderFresh() {
     <div class="card ticketcard">
       <div class="row" style="border:0;padding:0">
         <b>${esc(t.nom)}</b>
-        <span class="pill gold">Billet ${i + 1}/${fresh.length}</span>
+        <span class="pill gold">Billet ${i + 1}/${fresh.length} · ${MAD(t.prix)}</span>
       </div>
       <div class="mono">${t.code}</div>
       <button class="btn wa" data-share="${i}">Envoyer par WhatsApp</button>
@@ -306,8 +415,8 @@ $("#fresh").onclick = async (e) => {
   if (!b) return;
   if (b.dataset.share !== undefined) await shareTicket(fresh[+b.dataset.share], b);
   if (b.dataset.dl !== undefined) {
-    const blob = makeTicketPDF(fresh[+b.dataset.dl]);
-    download(blob, `billet-${fresh[+b.dataset.dl].code}.pdf`);
+    const t = fresh[+b.dataset.dl];
+    download(makeTicketPDF(t), `billet-${t.code}.pdf`);
   }
 };
 
@@ -316,7 +425,6 @@ async function shareTicket(t, btn) {
   const file = new File([blob], `billet-${t.code}.pdf`, { type: "application/pdf" });
   const text = `Bonjour ${t.nom} ! 🎉 Voici votre billet pour ${EV.name} (${MAD(t.prix)}). Présentez le QR code à l'entrée. Code : ${t.code}`;
 
-  // Partage natif : le PDF part directement dans WhatsApp
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({ files: [file], text });
@@ -329,7 +437,6 @@ async function shareTicket(t, btn) {
     }
   }
 
-  // Repli : téléchargement du PDF puis ouverture de WhatsApp
   download(blob, file.name);
   window.open(`https://wa.me/${t.tel}?text=${encodeURIComponent(text)}`, "_blank");
   await api("sent", { code: t.code });
@@ -357,14 +464,12 @@ function makeTicketPDF(t) {
   const W = 210, H = 90;
   const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: [W, H] });
 
-  // Fond nuit et cadre doré
   doc.setFillColor(11, 11, 26);
   doc.rect(0, 0, W, H, "F");
   doc.setDrawColor(212, 175, 55);
   doc.setLineWidth(0.6);
   doc.roundedRect(5, 5, W - 10, H - 10, 4, 4, "S");
 
-  // Titre et infos
   doc.setFont("times", "bold");
   doc.setFontSize(26);
   doc.setTextColor(212, 175, 55);
@@ -397,7 +502,6 @@ function makeTicketPDF(t) {
   doc.setTextColor(155, 155, 180);
   doc.text(`Prix : ${t.prix} MAD`, 84, 79);
 
-  // QR code (renvoie vers la vérification du billet)
   doc.setFillColor(255, 255, 255);
   doc.roundedRect(W - 72, 11, 60, 60, 3, 3, "F");
   doc.addImage(qrDataUrl(`${location.origin}/?v=${t.code}`), "PNG", W - 68, 15, 52, 52);
@@ -411,42 +515,62 @@ function makeTicketPDF(t) {
 /* ---------- TABLEAU DE BORD ---------- */
 async function loadStats() {
   if (!session) return;
-  try { renderStats(await api("stats")); } catch (err) { /* réseau : on réessaie au prochain cycle */ }
+  try { renderStats(await api("stats")); } catch (err) { /* on réessaie au prochain cycle */ }
+}
+
+function pill(t) {
+  return `<span class="pill ${t.utilise ? "gold" : t.envoye ? "ok" : ""}">${t.utilise ? "Entré" : t.envoye ? "Envoyé" : "Vendu"}</span>`;
 }
 
 function renderStats(s) {
-  const fmt = (n) => Number(n).toLocaleString("fr-FR");
+  lastStats = s;
   $("#kpis").innerHTML = [
     [fmt(s.total), "Billets vendus"],
-    [fmt(s.recettes) + " MAD", "Montant total vendu"],
+    [MAD(s.montant), "Montant total"],
     [fmt(s.envoyes), "Billets envoyés"],
     [fmt(s.entrees), "Entrées validées"],
   ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
 
-  const max = Math.max(1, ...s.vendeurs.map((v) => v.vendus));
-  $("#sellers").innerHTML = s.vendeurs.length
-    ? s.vendeurs.map((v) => `
-        <div style="padding:10px 0">
-          <div class="row" style="padding:0;border:0">
-            <b>${esc(v.vendeur)}</b>
-            <span style="color:var(--mut);font-size:13px">${v.vendus} billet${v.vendus > 1 ? "s" : ""} · ${fmt(v.recettes)} MAD</span>
-          </div>
-          <div class="bar"><i style="width:${(v.vendus / max) * 100}%"></i></div>
-        </div>`).join("")
-    : `<p class="hint">Aucune vente pour l'instant.</p>`;
+  const rows = s.vendeurs.map((v) => `
+    <tr>
+      <td>${esc(v.vendeur)}</td>
+      <td class="n">${fmt(v.vendus)}</td>
+      <td class="n">${MAD(v.montant)}</td>
+      <td class="n">${fmt(v.envoyes)}</td>
+      <td class="n">${fmt(v.entrees)}</td>
+    </tr>`).join("");
 
-  $("#recent").innerHTML = s.recent.length
-    ? s.recent.map((t) => `
+  $("#sellers").innerHTML = `
+    <thead><tr>
+      <th>Vendeur</th><th class="n">Billets</th><th class="n">Montant</th><th class="n">Envoyés</th><th class="n">Entrées</th>
+    </tr></thead>
+    <tbody>${rows || `<tr><td colspan="5" class="hint">Aucun vendeur pour l'instant.</td></tr>`}</tbody>
+    <tfoot><tr>
+      <td>Total</td><td class="n">${fmt(s.total)}</td><td class="n">${MAD(s.montant)}</td><td class="n">${fmt(s.envoyes)}</td><td class="n">${fmt(s.entrees)}</td>
+    </tr></tfoot>`;
+
+  if (!$("#hist").hidden) renderHist();
+}
+
+$("#openHist").onclick = () => { renderHist(); $("#hist").hidden = false; };
+$("#closeHist").onclick = () => { $("#hist").hidden = true; };
+
+function renderHist() {
+  const list = lastStats?.recent || [];
+  $("#histList").innerHTML = list.length
+    ? list.map((t) => `
         <div class="row">
           <span>
             ${esc(t.nom)}<br>
             <span class="mono" style="font-size:12px">${t.code}</span><br>
-            <small style="color:var(--mut)">par ${esc(t.vendeur)} · ${fmt(t.prix)} MAD</small>
+            <small style="color:var(--mut)">${esc(t.vendeur)} · ${MAD(t.prix)} · ${new Date(t.cree).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small>
           </span>
-          <span class="pill ${t.utilise ? "gold" : t.envoye ? "ok" : ""}">${t.utilise ? "Entré" : t.envoye ? "Envoyé" : "Vendu"}</span>
+          ${pill(t)}
         </div>`).join("")
-    : `<p class="hint">Aucune vente.</p>`;
+    : `<p class="hint">Aucune vente pour l'instant.</p>`;
 }
+
+$("#logout").onclick = $("#logout").onclick;
 
 /* ---------- SCANNER ---------- */
 let stream = null, scanning = false, busy = false, raf = null;
@@ -481,7 +605,7 @@ function tick() {
     c.height = v.videoHeight;
     ctx.drawImage(v, 0, 0, c.width, c.height);
     const img = ctx.getImageData(0, 0, c.width, c.height);
-    const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+    const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "attemptBoth" });
     if (code) handleScan(code.data);
   }
   raf = requestAnimationFrame(tick);
@@ -501,50 +625,56 @@ async function handleScan(raw) {
   const code = extractCode(raw);
   if (!/^[A-Z2-9]{10}$/.test(code)) return;
   busy = true;
-  await validate(code);
+  const r = await validate(code);
+  showResult(r);
   setTimeout(() => (busy = false), 2600);
 }
 
 async function validate(code) {
   try {
     const r = await api("validate", { code });
-    if (r.status === "valid") showResult("ok", "Billet authentique", r.ticket, "Entrée validée");
-    else if (r.status === "used") showResult("warn", "Billet déjà utilisé", r.ticket, "Ce billet a déjà été scanné");
-    else showResult("ko", "Billet non authentique", null, "Ce code ne correspond à aucun billet");
+    loadStats();
+    return r;
   } catch (err) {
-    showResult("error", "Erreur", null, err.message);
+    return { status: "error", msg: err.message };
   }
-  loadStats();
 }
 
-function showResult(kind, title, t, sub) {
-  const r = $("#res");
-  r.hidden = false;
-  r.querySelector(".resbox").className = "resbox " + kind;
-  r.querySelector(".ico").textContent = { ok: "✓", warn: "!", ko: "✕", error: "…" }[kind];
-  r.querySelector("h2").textContent = title;
-  r.querySelector("p").innerHTML = (t ? `<b>${esc(t.nom)}</b><br>` : "") + esc(sub);
+function showResult(r) {
+  const res = resultFor(r, true);
+  const box = $("#res");
+  box.hidden = false;
+  box.querySelector(".resbox").className = "resbox " + res.kind;
+  box.querySelector(".ico").textContent = res.icon;
+  box.querySelector("h2").textContent = res.title;
+  box.querySelector("p").innerHTML = (r.ticket ? `<b>${esc(r.ticket.nom)}</b><br>` : "") + esc(res.sub);
   clearTimeout(resT);
-  resT = setTimeout(() => (r.hidden = true), 2800);
+  resT = setTimeout(() => (box.hidden = true), 2800);
 }
 
 $("#res").onclick = () => ($("#res").hidden = true);
 
-$("#manForm").onsubmit = (e) => {
+$("#manForm").onsubmit = async (e) => {
   e.preventDefault();
   const code = extractCode($("#manCode").value);
   $("#manCode").value = "";
-  validate(code);
+  showResult(await validate(code));
 };
 
 /* ---------- DÉMARRAGE ---------- */
-if (session?.code) {
-  api("check")
-    .then(() => start())
-    .catch(() => showLogin());
-} else {
+(async function boot() {
+  if (verifyCode) return showVerify(verifyCode);
+  if (session?.code) {
+    try {
+      await api("check", { vendeur: session.vendeur });
+      return start();
+    } catch (err) {
+      session = null;
+      localStorage.removeItem("rv-session");
+    }
+  }
   showLogin();
-}
+})();
 </script>
 </body>
 </html>
