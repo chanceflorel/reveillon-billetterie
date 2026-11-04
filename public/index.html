@@ -3,91 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b0b1a">
-<title>Coup de minuit · Billetterie</title>
+<meta name="theme-color" content="#06170f">
+<title>Le Coup de minuit · Billetterie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
-:root{--bg:#0b0b1a;--panel:#151529;--panel2:#1d1d38;--gold:#d4af37;--gold2:#f3d77a;--txt:#f5f1e6;--mut:#9b9bb4;--ok:#22c55e;--ko:#ef4444;--warn:#f59e0b}
+:root{--gold:#f3c969;--gold2:#ffe29a;--red:#d62f3a;--txt:#fff8ec;--mut:#b9d3c4;--panel:rgba(10,36,26,.78)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{margin:0;min-height:100%;background:radial-gradient(1000px 520px at 50% -12%,#2a2456,var(--bg) 70%) fixed;color:var(--txt);font-family:Inter,system-ui,sans-serif}
-body{padding-bottom:calc(92px + env(safe-area-inset-bottom));padding-top:env(safe-area-inset-top)}
+html,body{margin:0;min-height:100%;color:var(--txt);font-family:Inter,system-ui,sans-serif;background:radial-gradient(900px 520px at 50% -12%,#1f6b4a 0%,transparent 60%),radial-gradient(700px 500px at 100% 100%,#6a1422 0%,transparent 55%),linear-gradient(180deg,#06170f,#0a2216 60%,#06120d) fixed}
+body{padding-bottom:calc(96px + env(safe-area-inset-bottom));padding-top:env(safe-area-inset-top)}
 h1,h2{font-family:"Playfair Display",Georgia,serif;margin:0;font-weight:700}
-.wrap{max-width:640px;margin:0 auto;padding:16px}
-.hero{text-align:center;padding:26px 0 6px}
-.hero .moon{font-size:40px;line-height:1}
-.hero h1{font-size:32px;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:6px}
-.hero p{color:var(--mut);margin:6px 0 0;font-size:14px}
-.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid #ffffff14;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 32px #0007}
-.card h2{font-size:20px;margin-bottom:14px}
+#snow,#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+#fx{z-index:9}
+.wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:16px}
+.garland{position:fixed;top:0;left:0;right:0;height:16px;z-index:6;pointer-events:none;background:radial-gradient(circle,#ffd76a 0 3px,transparent 3.6px) 0 3px/26px 16px repeat-x,radial-gradient(circle,#ff4d5a 0 3px,transparent 3.6px) 13px 9px/26px 16px repeat-x;animation:glow 1.8s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.45}to{opacity:1}}
+.hero{text-align:center;padding:34px 0 6px}
+.title{font-family:"Mountains of Christmas",cursive;font-size:46px;line-height:1.1;color:var(--gold2);margin:4px 0 0;text-shadow:0 0 18px #f3c96966,0 2px 0 #7a4b00;animation:shine 3s ease-in-out infinite alternate}
+@keyframes shine{from{filter:brightness(1)}to{filter:brightness(1.3)}}
+.hero p{color:var(--mut);margin:8px 0 0;font-size:14px}
+.tree{width:104px;display:block;margin:0 auto;filter:drop-shadow(0 0 16px #f3c96955);animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+.twinkle{animation:tw 1.6s ease-in-out infinite alternate}
+.d2{animation-delay:.5s}.d3{animation-delay:1s}
+@keyframes tw{from{opacity:.25}to{opacity:1}}
+.baubles{display:flex;justify-content:center;flex-wrap:wrap;margin:10px 0 0}
+.bauble{display:inline-block;width:16px;height:16px;border-radius:50%;margin:0 10px;transform-origin:50% -20px;animation:swing 3.2s ease-in-out infinite alternate;box-shadow:inset -3px -3px 6px #0006,0 0 12px currentColor}
+.bauble:nth-child(2n){animation-delay:.6s}
+.bauble.r{background:radial-gradient(circle at 35% 30%,#ff9a9a,#d62f3a 55%,#6a0d16);color:#d62f3a}
+.bauble.g{background:radial-gradient(circle at 35% 30%,#fff3c4,#f3c969 55%,#8a6512);color:#f3c969}
+.bauble.w{background:radial-gradient(circle at 35% 30%,#ffffff,#c9d6e0 55%,#5a6a78);color:#c9d6e0}
+@keyframes swing{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+.cd{display:flex;gap:8px;justify-content:center;margin:16px 0 4px}
+.cd div{background:rgba(255,255,255,.07);border:1px solid #f3c96943;border-radius:14px;padding:10px 0;width:74px}
+.cd b{display:block;font-family:"Playfair Display",serif;font-size:26px;color:var(--gold2)}
+.cd span{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}
+.happy{font-family:"Mountains of Christmas",cursive;font-size:28px;color:var(--gold2)}
+.card{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid #f3c96938;border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 14px 40px #0008;animation:rise .5s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card h2{font-size:21px;margin-bottom:14px;color:var(--gold2)}
 .sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.sec-head h2{font-size:20px}
+.sec-head h2{font-size:20px;color:var(--gold2)}
 label{display:block;font-size:13px;color:var(--mut);margin-bottom:14px}
-input,select{display:block;width:100%;margin-top:6px;padding:13px 14px;border-radius:12px;border:1px solid #ffffff1f;background:#0e0e22;color:var(--txt);font:inherit;font-size:16px;appearance:none}
+input,select{display:block;width:100%;margin-top:6px;padding:13px 14px;border-radius:12px;border:1px solid #f3c96933;background:#071a12;color:var(--txt);font:inherit;font-size:16px;appearance:none}
 input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:#1a1400;font:600 16px Inter,sans-serif;cursor:pointer;text-decoration:none;margin-top:4px}
-.btn.ghost{background:#ffffff12;color:var(--txt)}
-.btn.wa{background:#25d366;color:#04230f}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(90deg,#f3c969,#ffe29a,#f3c969);background-size:200% auto;color:#2a1a00;font:600 16px Inter,sans-serif;cursor:pointer;text-decoration:none;margin-top:4px;transition:background-position .6s,transform .15s,box-shadow .3s;box-shadow:0 6px 18px #f3c96933}
+.btn:hover{background-position:right center;box-shadow:0 8px 26px #f3c96966}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:#ffffff12;color:var(--txt);box-shadow:none;border:1px solid #f3c96926}
+.btn.red{background:linear-gradient(90deg,#b71c2a,#e53945,#b71c2a);background-size:200% auto;color:#fff}
+.btn.wa{background:linear-gradient(90deg,#1faa52,#25d366);color:#04230f}
 .btn:disabled{opacity:.5;cursor:default}
 .btn+.btn{margin-top:10px}
-.chip{background:#ffffff14;color:var(--gold2);border:1px solid #d4af3740;border-radius:99px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer}
-.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;gap:6px;background:#0e0e22e6;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid #ffffff14;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.chip{background:#ffffff14;color:var(--gold2);border:1px solid #f3c96940;border-radius:99px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer}
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;gap:6px;background:#06170fe8;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid #f3c96933;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
 .tabs button{flex:1;background:none;border:0;color:var(--mut);font:500 12px Inter,sans-serif;padding:8px 4px;border-radius:12px;cursor:pointer}
 .tabs button .ic{display:block;font-size:20px;margin-bottom:2px}
-.tabs button.on{color:var(--gold);background:#d4af3718}
+.tabs button.on{color:var(--gold2);background:#f3c96918}
+.tabs button.on .ic{animation:bob .6s ease}
+@keyframes bob{40%{transform:translateY(-5px)}}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.kpi{background:linear-gradient(180deg,#ffffff12,#ffffff06);border:1px solid #ffffff12;border-radius:16px;padding:16px}
+.kpi{background:linear-gradient(180deg,#ffffff14,#ffffff06);border:1px solid #f3c96926;border-radius:16px;padding:16px;animation:rise .5s ease both}
+.kpi:nth-child(2){animation-delay:.08s}.kpi:nth-child(3){animation-delay:.16s}.kpi:nth-child(4){animation-delay:.24s}
 .kpi b{display:block;font-family:"Playfair Display",serif;font-size:26px;color:var(--gold2)}
 .kpi span{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
 .tblwrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{padding:10px 6px;border-bottom:1px solid #ffffff10;text-align:left}
+th,td{padding:10px 6px;border-bottom:1px solid #ffffff12;text-align:left}
 th{color:var(--mut);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
 .n{text-align:right;white-space:nowrap}
 tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #ffffff10;font-size:14px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #ffffff12;font-size:14px}
 .row:last-child{border-bottom:0}
 .pill{font-size:11px;padding:4px 10px;border-radius:99px;background:#ffffff14;color:var(--mut);white-space:nowrap}
-.pill.ok{background:#22c55e22;color:#86efac}
-.pill.gold{background:#d4af3726;color:var(--gold2)}
+.pill.ok{background:#22c55e26;color:#9ef0b8}
+.pill.gold{background:#f3c96928;color:var(--gold2)}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;color:var(--gold2)}
 .hint{color:var(--mut);font-size:13px;text-align:center;margin:10px 0 0}
 .msg{padding:11px 13px;border-radius:12px;font-size:14px;margin-top:6px}
-.msg.err{background:#ef444422;color:#fca5a5}
-.msg.good{background:#22c55e22;color:#86efac}
+.msg.err{background:#ef444426;color:#fca5a5}
+.msg.good{background:#22c55e26;color:#9ef0b8}
+.ticketcard{animation:rise .6s ease both}
 .ticketcard .mono{font-size:20px;text-align:center;margin:10px 0 14px}
-.camwrap{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1/1}
+.camwrap{position:relative;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:1/1;border:2px solid #f3c96950}
 .camwrap video{width:100%;height:100%;object-fit:cover}
-.frame{position:absolute;inset:16%;border:2px solid var(--gold);border-radius:20px;box-shadow:0 0 0 999px #0009}
+.frame{position:absolute;inset:16%;border:2px solid var(--gold);border-radius:20px;box-shadow:0 0 0 999px #0009;animation:pulse 1.8s ease-in-out infinite alternate}
+@keyframes pulse{from{border-color:#f3c969;box-shadow:0 0 0 999px #0009,0 0 0 #f3c96900}to{border-color:#ff5a64;box-shadow:0 0 0 999px #0009,0 0 22px #f3c96999}}
 .resbox{border-radius:24px;padding:28px 22px;text-align:center;color:#fff;box-shadow:0 20px 60px #000a}
 .resbox.inline{box-shadow:none;margin:0 0 14px}
-.resbox.ok{background:linear-gradient(160deg,#16a34a,#15803d)}
+.resbox.ok{background:linear-gradient(160deg,#16a34a,#0f6d33)}
 .resbox.warn{background:linear-gradient(160deg,#f59e0b,#b45309)}
-.resbox.ko,.resbox.error{background:linear-gradient(160deg,#ef4444,#b91c1c)}
+.resbox.ko,.resbox.error{background:linear-gradient(160deg,#ef4444,#9b1c1c)}
 .resbox .ico{width:64px;height:64px;margin:0 auto 12px;border-radius:50%;background:#ffffff26;display:grid;place-items:center;font-size:30px;font-weight:700}
 .resbox h2{font-size:24px;margin-bottom:8px}
 .resbox p{margin:0;opacity:.92}
 .resbox .vt{margin-top:12px;font-size:15px;opacity:.95}
 .overlay{position:fixed;inset:0;display:grid;place-items:center;background:#000b;z-index:10;padding:24px}
-.overlay .resbox{width:min(92vw,380px);animation:pop .25s ease}
+.overlay .resbox{width:min(92vw,380px);animation:pop .3s ease}
 .sheet{position:fixed;inset:0;background:#000b;z-index:8;display:flex;align-items:flex-end;justify-content:center}
-.sheet-card{width:100%;max-width:640px;max-height:86vh;overflow:auto;background:var(--panel);border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}
-@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+.sheet-card{width:100%;max-width:640px;max-height:86vh;overflow:auto;background:#0a2418;border:1px solid #f3c96933;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
+<canvas id="snow"></canvas>
+<canvas id="fx"></canvas>
+<div class="garland"></div>
+
 <!-- VÉRIFICATION D'UN BILLET (ouverte par le QR code, sans connexion requise) -->
 <section id="verify" class="wrap" hidden>
   <div class="hero">
-    <div class="moon">🥂</div>
-    <h1>Vérification</h1>
-    <p>Coup de minuit · 31 décembre</p>
+    <svg class="tree" viewBox="0 -6 120 136" aria-hidden="true">
+      <polygon points="60,-2 65,8 55,8" fill="#ffe29a"/>
+      <polygon points="60,4 100,50 20,50" fill="#1b6b4a"/>
+      <polygon points="60,28 110,84 10,84" fill="#17583d"/>
+      <polygon points="60,58 120,118 0,118" fill="#124a33"/>
+      <rect x="54" y="118" width="12" height="10" fill="#5a3a1a"/>
+      <circle cx="60" cy="40" r="4" fill="#d62f3a" class="twinkle"/>
+      <circle cx="45" cy="78" r="4" fill="#f3c969" class="twinkle d2"/>
+      <circle cx="78" cy="98" r="4" fill="#d62f3a" class="twinkle d3"/>
+      <circle cx="30" cy="110" r="4" fill="#f3c969" class="twinkle"/>
+      <circle cx="92" cy="112" r="4" fill="#fff" class="twinkle d2"/>
+    </svg>
+    <h1 class="title">Vérification</h1>
+    <p>Le Coup de minuit · 31 décembre 2026</p>
   </div>
   <div class="card" id="vBody"></div>
   <button class="btn ghost" id="vBack">Retour à l'application</button>
@@ -96,9 +142,22 @@ tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
 <!-- CONNEXION -->
 <section id="login" class="wrap" hidden>
   <div class="hero">
-    <div class="moon">🥂</div>
-    <h1>Coup de minuit</h1>
-    <p>31 décembre · Après la messe</p>
+    <svg class="tree" viewBox="0 -6 120 136" aria-hidden="true">
+      <polygon points="60,-2 65,8 55,8" fill="#ffe29a"/>
+      <polygon points="60,4 100,50 20,50" fill="#1b6b4a"/>
+      <polygon points="60,28 110,84 10,84" fill="#17583d"/>
+      <polygon points="60,58 120,118 0,118" fill="#124a33"/>
+      <rect x="54" y="118" width="12" height="10" fill="#5a3a1a"/>
+      <circle cx="60" cy="40" r="4" fill="#d62f3a" class="twinkle"/>
+      <circle cx="45" cy="78" r="4" fill="#f3c969" class="twinkle d2"/>
+      <circle cx="78" cy="98" r="4" fill="#d62f3a" class="twinkle d3"/>
+      <circle cx="30" cy="110" r="4" fill="#f3c969" class="twinkle"/>
+      <circle cx="92" cy="112" r="4" fill="#fff" class="twinkle d2"/>
+    </svg>
+    <h1 class="title">Le Coup de minuit</h1>
+    <p>Réveillon 31 décembre 2026 · Après la messe</p>
+    <p>Salle de fête de la paroisse NDDL</p>
+    <div class="cd" data-countdown></div>
   </div>
   <form id="loginForm" class="card">
     <h2>Accès vendeurs</h2>
@@ -117,9 +176,12 @@ tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
 <main id="app" hidden>
   <div class="wrap">
     <div class="hero">
-      <div class="moon">🥂</div>
-      <h1>Coup de minuit</h1>
+      <h1 class="title">Le Coup de minuit</h1>
+      <div class="baubles">
+        <span class="bauble r"></span><span class="bauble g"></span><span class="bauble w"></span><span class="bauble r"></span><span class="bauble g"></span>
+      </div>
       <p id="who"></p>
+      <div class="cd" data-countdown></div>
     </div>
 
     <!-- VENDRE -->
@@ -161,7 +223,7 @@ tfoot td{font-weight:600;color:var(--gold2);border-bottom:0}
         <div class="tblwrap"><table id="sellers"></table></div>
       </div>
       <button class="btn ghost" id="openSellers">Voir tous les vendeurs</button>
-      <button class="btn ghost" id="reset" style="margin-top:10px">Remettre le tableau à zéro</button>
+      <button class="btn red" id="reset" style="margin-top:10px">Remettre le tableau à zéro</button>
     </section>
 
     <!-- SCANNER -->
@@ -229,7 +291,16 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
 const fmt = (n) => Number(n).toLocaleString("fr-FR");
 const MAD = (n) => fmt(n) + " MAD";
-const EV = { name: "Coup de minuit", date: "31 décembre", place: "Après la messe" };
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Informations de l'événement (modifiez ici si besoin)
+const EV = {
+  name: "Le Coup de minuit",
+  date: "31 décembre 2026",
+  heure: "Après la messe",
+  lieu: "Salle de fête de la paroisse NDDL",
+};
+const TARGET = new Date(2027, 0, 1, 0, 0, 0);
 
 let session = JSON.parse(localStorage.getItem("rv-session") || "null");
 let fresh = [];
@@ -244,6 +315,80 @@ if (verifyParam) {
   verifyCode = verifyParam.trim().toUpperCase();
   history.replaceState(null, "", location.pathname);
 }
+
+/* ---------- NEIGE ---------- */
+const snowCv = $("#snow"), sctx = snowCv.getContext("2d");
+let flakes = [];
+function sizeCanvas() {
+  snowCv.width = innerWidth;
+  snowCv.height = innerHeight;
+  $("#fx").width = innerWidth;
+  $("#fx").height = innerHeight;
+  flakes = Array.from({ length: innerWidth < 600 ? 50 : 100 }, () => ({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight,
+    r: Math.random() * 2.4 + 0.8,
+    v: Math.random() * 0.6 + 0.3,
+    d: Math.random() * Math.PI * 2,
+  }));
+}
+function drawSnow() {
+  sctx.clearRect(0, 0, snowCv.width, snowCv.height);
+  sctx.fillStyle = "rgba(255,255,255,.85)";
+  for (const f of flakes) {
+    f.y += f.v;
+    f.d += 0.01;
+    f.x += Math.sin(f.d) * 0.4;
+    if (f.y > innerHeight) { f.y = -5; f.x = Math.random() * innerWidth; }
+    sctx.beginPath();
+    sctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+    sctx.fill();
+  }
+  requestAnimationFrame(drawSnow);
+}
+addEventListener("resize", sizeCanvas);
+sizeCanvas();
+if (!REDUCED) drawSnow();
+
+/* ---------- CONFETTIS ---------- */
+function confetti() {
+  if (REDUCED) return;
+  const c = $("#fx"), x = c.getContext("2d");
+  const colors = ["#f3c969", "#ffe29a", "#d62f3a", "#22c55e", "#ffffff"];
+  const ps = Array.from({ length: 140 }, () => ({
+    x: innerWidth / 2, y: innerHeight / 2,
+    vx: (Math.random() - 0.5) * 16, vy: (Math.random() - 1.3) * 16,
+    s: Math.random() * 6 + 3, c: colors[(Math.random() * colors.length) | 0], life: 110,
+  }));
+  (function step() {
+    x.clearRect(0, 0, c.width, c.height);
+    let alive = false;
+    for (const p of ps) {
+      if (p.life <= 0) continue;
+      alive = true;
+      p.vy += 0.35; p.x += p.vx; p.y += p.vy; p.life--;
+      x.globalAlpha = Math.max(p.life / 110, 0);
+      x.fillStyle = p.c;
+      x.fillRect(p.x, p.y, p.s, p.s * 0.5);
+    }
+    x.globalAlpha = 1;
+    if (alive) requestAnimationFrame(step); else x.clearRect(0, 0, c.width, c.height);
+  })();
+}
+
+/* ---------- COMPTE À REBOURS ---------- */
+function tickCountdown() {
+  const diff = TARGET - new Date();
+  document.querySelectorAll("[data-countdown]").forEach((el) => {
+    if (diff <= 0) { el.innerHTML = `<p class="happy">🎆 Bonne année 2027 !</p>`; return; }
+    const d = Math.floor(diff / 864e5), h = Math.floor(diff / 36e5) % 24;
+    const m = Math.floor(diff / 6e4) % 60, s = Math.floor(diff / 1e3) % 60;
+    el.innerHTML = [[d, "jours"], [h, "heures"], [m, "min"], [s, "sec"]]
+      .map(([v, l]) => `<div><b>${String(v).padStart(2, "0")}</b><span>${l}</span></div>`).join("");
+  });
+}
+setInterval(tickCountdown, 1000);
+tickCountdown();
 
 /* ---------- API ---------- */
 async function api(path, body) {
@@ -312,12 +457,13 @@ async function showVerify(code) {
     r = { status: "error", msg: err.message };
   }
   renderVerify(r, false);
+  if (r.status === "valid") confetti();
 }
 
 function resultFor(r, validated) {
   switch (r.status) {
     case "valid":
-      return { kind: "ok", icon: "✓", title: "Billet authentique", sub: validated ? "Entrée validée" : "Billet valide, entrée non encore validée" };
+      return { kind: "ok", icon: "✓", title: "Billet authentique", sub: validated ? "Entrée validée. Bonne fête !" : "Billet valide, entrée non encore validée" };
     case "used":
       return { kind: "warn", icon: "!", title: "Billet déjà utilisé", sub: "Ce billet a déjà été scanné" };
     case "invalid":
@@ -354,6 +500,7 @@ $("#vBody").onclick = async (e) => {
   b.textContent = "Validation…";
   const r = await validate(verifyCode);
   renderVerify(r, true);
+  if (r.status === "valid") confetti();
   loadStats();
 };
 
@@ -461,7 +608,7 @@ function download(blob, name) {
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
-/* ---------- PDF DU BILLET ---------- */
+/* ---------- PDF DU BILLET (design fête) ---------- */
 function qrDataUrl(text) {
   const holder = document.createElement("div");
   new QRCode(holder, { text, width: 480, height: 480, correctLevel: QRCode.CorrectLevel.H });
@@ -473,50 +620,141 @@ function makeTicketPDF(t) {
   const W = 210, H = 90;
   const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: [W, H] });
 
-  doc.setFillColor(11, 11, 26);
+  const rgb = (hex) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+  const fill = (hex) => doc.setFillColor(...rgb(hex));
+  const ink = (hex) => doc.setTextColor(...rgb(hex));
+  const alpha = (a) => doc.setGState(new doc.GState({ opacity: a }));
+  const poly = (pts) => {
+    const rel = pts.slice(1).map((p, i) => [p[0] - pts[i][0], p[1] - pts[i][1]]);
+    doc.lines(rel, pts[0][0], pts[0][1], [1, 1], "F", true);
+  };
+  const star = (cx, cy, R, hex) => {
+    fill(hex);
+    const pts = [];
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 ? R * 0.45 : R, a = -Math.PI / 2 + (i * Math.PI) / 5;
+      pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+    }
+    poly(pts);
+  };
+  const tree = (x, ground, h, hex) => {
+    fill(hex);
+    for (let k = 0; k < 3; k++) {
+      const top = ground - h + k * h * 0.28;
+      const w = h * 0.55 * (1 - k * 0.2);
+      const bottom = top + h * 0.5;
+      poly([[x, top], [x + w / 2, bottom], [x - w / 2, bottom]]);
+    }
+    fill("#4a2c14");
+    doc.rect(x - 0.8, ground - 1.5, 1.6, 1.5, "F");
+  };
+  const bauble = (x, y, r, hex) => {
+    fill(hex);
+    doc.circle(x, y, r, "F");
+    alpha(0.4);
+    fill("#ffffff");
+    doc.circle(x - r * 0.35, y - r * 0.35, r * 0.28, "F");
+    alpha(1);
+  };
+
+  // Fond vert sapin et halos
+  fill("#0a2a1b");
   doc.rect(0, 0, W, H, "F");
-  doc.setDrawColor(212, 175, 55);
-  doc.setLineWidth(0.6);
-  doc.roundedRect(5, 5, W - 10, H - 10, 4, 4, "S");
+  alpha(0.18); fill("#d62f3a"); doc.circle(205, 4, 40, "F");
+  alpha(0.12); fill("#f3c969"); doc.circle(0, 90, 55, "F");
+  alpha(1);
 
-  doc.setFont("times", "bold");
+  // Neige
+  alpha(0.7); fill("#ffffff");
+  for (let i = 0; i < 40; i++) doc.circle((i * 37) % W, (i * 53) % H, 0.35 + (i % 3) * 0.2, "F");
+  alpha(1);
+
+  // Guirlande de boules en haut
+  ["#d62f3a", "#f3c969", "#ffffff"].forEach((c, i) => {});
+  for (let x = 8; x < 150; x += 12) bauble(x, 3.5, 1.6, (x / 12) % 3 === 0 ? "#d62f3a" : (x / 12) % 3 === 1 ? "#f3c969" : "#e8eef2");
+
+  // Bordure dorée
+  doc.setDrawColor(243, 201, 105);
+  doc.setLineWidth(0.8);
+  doc.roundedRect(3, 3, W - 6, H - 6, 4, 4, "S");
+  doc.setLineWidth(0.2);
+  doc.roundedRect(5.5, 5.5, W - 11, H - 11, 3, 3, "S");
+
+  // Sapins en bas de la partie gauche
+  tree(104, H, 16, "#14523a");
+  tree(120, H, 21, "#1b6b4a");
+  tree(137, H, 15, "#14523a");
+
+  // Étoiles
+  star(30, 14, 2.2, "#ffe29a");
+  star(86, 9, 1.6, "#ffe29a");
+  star(140, 12, 1.8, "#ffe29a");
+
+  // Titre et infos
+  doc.setFont("times", "bolditalic");
   doc.setFontSize(26);
-  doc.setTextColor(212, 175, 55);
-  doc.text("COUP DE MINUIT", 14, 25);
+  ink("#ffe29a");
+  doc.text(EV.name, 14, 24);
 
   doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  ink("#cfe8d9");
+  doc.text(`Réveillon · ${EV.date} · ${EV.heure}`, 14, 31);
+
+  doc.setFont("times", "italic");
   doc.setFontSize(10);
-  doc.setTextColor(200, 200, 215);
-  doc.text(`${EV.date} · ${EV.place}`, 14, 33);
+  ink("#f3c969");
+  doc.text(EV.lieu, 14, 37);
 
-  doc.setFontSize(8);
-  doc.setTextColor(155, 155, 180);
-  doc.text("TITULAIRE", 14, 52);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.setTextColor(245, 241, 230);
-  doc.text(t.nom, 14, 60);
-
+  // Titulaire
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(155, 155, 180);
-  doc.text("CODE", 14, 72);
-  doc.setFont("courier", "bold");
-  doc.setFontSize(13);
-  doc.setTextColor(243, 215, 122);
-  doc.text(t.code.match(/.{1,5}/g).join("  "), 14, 79);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(155, 155, 180);
-  doc.text(`Prix : ${t.prix} MAD`, 84, 79);
-
-  doc.setFillColor(255, 255, 255);
-  doc.roundedRect(W - 72, 11, 60, 60, 3, 3, "F");
-  doc.addImage(qrDataUrl(`${location.origin}/?v=${t.code}`), "PNG", W - 68, 15, 52, 52);
   doc.setFontSize(7);
-  doc.setTextColor(155, 155, 180);
-  doc.text("Scannez à l'entrée", W - 42, 80, { align: "center" });
+  ink("#9cc7b0");
+  doc.text("TITULAIRE", 14, 47);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(17);
+  ink("#fff8ec");
+  doc.text(String(t.nom), 14, 55, { maxWidth: 80 });
+
+  // Prix
+  fill("#d62f3a");
+  doc.roundedRect(100, 45, 40, 11, 5.5, 5.5, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  ink("#ffffff");
+  doc.text(`${t.prix} MAD`, 120, 52, { align: "center" });
+
+  // Code
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
+  ink("#9cc7b0");
+  doc.text("CODE", 14, 68);
+  doc.setFont("courier", "bold");
+  doc.setFontSize(12);
+  ink("#ffe29a");
+  doc.text(t.code.match(/.{1,5}/g).join("  "), 14, 75);
+
+  // Séparation pointillée (talon)
+  doc.setDrawColor(243, 201, 105);
+  doc.setLineDashPattern([1.2, 1.2], 0);
+  doc.line(152, 8, 152, H - 8);
+  doc.setLineDashPattern([], 0);
+
+  // Talon : QR code
+  fill("#ffffff");
+  doc.roundedRect(158, 12, 40, 40, 3, 3, "F");
+  doc.addImage(qrDataUrl(`${location.origin}/?v=${t.code}`), "PNG", 160, 14, 36, 36);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+  ink("#ffe29a");
+  doc.text("Scannez à l'entrée", 178, 59, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(6);
+  ink("#9cc7b0");
+  doc.text("Valable une seule fois", 178, 63, { align: "center" });
+
+  bauble(206, 80, 2.4, "#d62f3a");
+  bauble(158, 80, 2, "#f3c969");
 
   return doc.output("blob");
 }
@@ -589,7 +827,7 @@ function renderSellers() {
   const list = lastStats?.vendeurs || [];
   $("#sellersList").innerHTML = list.length
     ? list.map((v) => `
-        <div style="padding:12px 0;border-bottom:1px solid #ffffff10">
+        <div style="padding:12px 0;border-bottom:1px solid #ffffff12">
           <div class="row" style="padding:0;border:0">
             <b>${esc(v.vendeur)}</b>
             <span style="color:var(--gold2);font-size:14px">${MAD(v.montant)}</span>
@@ -604,65 +842,91 @@ function renderSellers() {
 /* ---------- REMISE À ZÉRO ---------- */
 $("#reset").onclick = async () => {
   if (!confirm("Effacer TOUTES les ventes et tous les vendeurs ? Cette action est irréversible.")) return;
-  const word = prompt("Pour confirmer, tapez EFFACER :");
-  if (word !== "EFFACER") return;
+  const code = prompt("Code de remise à zéro :");
+  if (!code) return;
   try {
-    await api("reset", { confirm: word });
-    lastStats = null;
-    loadStats();
+    await api("reset", { resetCode: code.trim() });
+    lastStats = { total: 0, montant: 0, envoyes: 0, entrees: 0, vendeurs: [], recent: [] };
+    renderStats(lastStats);
+    setTimeout(loadStats, 1500);
     alert("Tableau remis à zéro.");
   } catch (err) {
-    alert(err.message);
+    alert("Remise à zéro refusée : " + err.message);
   }
 };
 
 /* ---------- SCANNER ---------- */
 let stream = null, scanning = false, busy = false, raf = null;
+let detector = null;
+if ("BarcodeDetector" in window) {
+  try { detector = new BarcodeDetector({ formats: ["qr_code"] }); } catch (e) { detector = null; }
+}
+let detecting = false;
 
 async function startCam() {
   if (scanning) return;
+  const msgEl = $("#camMsg");
   if (!navigator.mediaDevices?.getUserMedia) {
-    $("#camMsg").textContent = "Caméra non disponible ici. Ouvrez le site dans Chrome ou Safari, ou utilisez « Prendre une photo » ci-dessous.";
+    msgEl.textContent = "Caméra indisponible dans ce navigateur. Ouvrez le site dans Chrome ou Safari, ou utilisez « Prendre une photo ».";
+    return;
+  }
+  if (!detector && typeof jsQR !== "function") {
+    msgEl.textContent = "Lecteur QR non chargé. Rechargez la page (Ctrl+F5), ou utilisez « Prendre une photo ».";
     return;
   }
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
     const v = $("#vid");
     v.srcObject = stream;
     await v.play();
     scanning = true;
-    $("#camMsg").textContent = "Pointez la caméra vers le QR code du billet.";
-    tick();
+    msgEl.textContent = "Pointez la caméra vers le QR code du billet.";
+    raf = requestAnimationFrame(scanLoop);
   } catch (err) {
     const raisons = {
       NotAllowedError: "accès refusé (autorisez la caméra dans les réglages du navigateur)",
       NotFoundError: "aucune caméra trouvée",
       NotReadableError: "caméra utilisée par une autre application",
-      OverconstrainedError: "caméra arrière indisponible",
+      OverconstrainedError: "caméra indisponible",
+      SecurityError: "le site doit être ouvert en https",
     };
-    $("#camMsg").textContent = "Caméra indisponible : " + (raisons[err.name] || err.name) + ". Utilisez « Prendre une photo » ci-dessous.";
+    msgEl.textContent = "Caméra indisponible : " + (raisons[err.name] || err.message || err.name) + ". Utilisez « Prendre une photo ».";
   }
 }
 
 function stopCam() {
   scanning = false;
-  cancelAnimationFrame(raf);
+  if (raf) cancelAnimationFrame(raf);
   if (stream) stream.getTracks().forEach((t) => t.stop());
   stream = null;
 }
 
-function tick() {
+async function scanLoop() {
   if (!scanning) return;
-  const v = $("#vid"), c = $("#cv"), ctx = c.getContext("2d", { willReadFrequently: true });
-  if (v.readyState === v.HAVE_ENOUGH_DATA && !busy) {
-    c.width = v.videoWidth;
-    c.height = v.videoHeight;
-    ctx.drawImage(v, 0, 0, c.width, c.height);
-    const img = ctx.getImageData(0, 0, c.width, c.height);
-    const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "attemptBoth" });
-    if (code) handleScan(code.data);
+  const v = $("#vid");
+  if (!busy && v.readyState >= 2) {
+    try {
+      let raw = null;
+      if (detector) {
+        if (!detecting) {
+          detecting = true;
+          const found = await detector.detect(v).catch(() => []);
+          detecting = false;
+          if (found.length) raw = found[0].rawValue;
+        }
+      } else {
+        const c = $("#cv"), ctx = c.getContext("2d", { willReadFrequently: true });
+        c.width = v.videoWidth;
+        c.height = v.videoHeight;
+        ctx.drawImage(v, 0, 0, c.width, c.height);
+        const d = ctx.getImageData(0, 0, c.width, c.height);
+        const q = jsQR(d.data, d.width, d.height, { inversionAttempts: "attemptBoth" });
+        if (q) raw = q.data;
+      }
+      if (raw) await handleScan(raw);
+    } catch (e) { /* image suivante */ }
   }
-  raf = requestAnimationFrame(tick);
+  if (scanning) raf = requestAnimationFrame(scanLoop);
 }
 
 function extractCode(raw) {
@@ -681,7 +945,7 @@ async function handleScan(raw) {
   busy = true;
   const r = await validate(code);
   showResult(r);
-  setTimeout(() => (busy = false), 2600);
+  setTimeout(() => (busy = false), 2500);
 }
 
 async function validate(code) {
@@ -702,6 +966,7 @@ function showResult(r) {
   box.querySelector(".ico").textContent = res.icon;
   box.querySelector("h2").textContent = res.title;
   box.querySelector("p").innerHTML = (r.ticket ? `<b>${esc(r.ticket.nom)}</b><br>` : "") + esc(res.sub);
+  if (res.kind === "ok") confetti();
   clearTimeout(resT);
   resT = setTimeout(() => (box.hidden = true), 2800);
 }
@@ -715,25 +980,34 @@ $("#manForm").onsubmit = async (e) => {
   showResult(await validate(code));
 };
 
-$("#photo").onchange = (e) => {
+async function readQRFromImage(img) {
+  if (detector) {
+    const found = await detector.detect(img).catch(() => []);
+    if (found.length) return found[0].rawValue;
+  }
+  if (typeof jsQR !== "function") return null;
+  const c = $("#cv"), ctx = c.getContext("2d", { willReadFrequently: true });
+  c.width = img.width;
+  c.height = img.height;
+  ctx.drawImage(img, 0, 0);
+  const d = ctx.getImageData(0, 0, c.width, c.height);
+  const q = jsQR(d.data, d.width, d.height, { inversionAttempts: "attemptBoth" });
+  return q ? q.data : null;
+}
+
+$("#photo").onchange = async (e) => {
   const file = e.target.files[0];
+  e.target.value = "";
   if (!file) return;
   const img = new Image();
-  img.onload = async () => {
-    const c = $("#cv"), ctx = c.getContext("2d", { willReadFrequently: true });
-    c.width = img.width;
-    c.height = img.height;
-    ctx.drawImage(img, 0, 0);
-    const d = ctx.getImageData(0, 0, c.width, c.height);
-    const q = jsQR(d.data, d.width, d.height, { inversionAttempts: "attemptBoth" });
-    e.target.value = "";
-    if (!q) {
-      showResult({ status: "error", msg: "QR code illisible sur cette photo. Reprenez-la plus près, bien droite, avec de la lumière." });
-      return;
-    }
-    showResult(await validate(extractCode(q.data)));
-  };
   img.src = URL.createObjectURL(file);
+  await img.decode();
+  const raw = await readQRFromImage(img);
+  if (!raw) {
+    showResult({ status: "error", msg: "QR code illisible sur cette photo. Reprenez-la plus près, bien droite, avec de la lumière." });
+    return;
+  }
+  showResult(await validate(extractCode(raw)));
 };
 
 /* ---------- DÉMARRAGE ---------- */
