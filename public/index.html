@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b1a">
+<title>Coup de minuit · Billetterie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<style>
+:root{--bg:#0b0b1a;--panel:#151529;--panel2:#1d1d38;--gold:#d4af37;--gold2:#f3d77a;--txt:#f5f1e6;--mut:#9b9bb4;--ok:#22c55e;--ko:#ef4444;--warn:#f59e0b}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;background:radial-gradient(1000px 520px at 50% -12%,#2a2456,var(--bg) 70%) fixed;color:var(--txt);font-family:Inter,system-ui,sans-serif}
+body{padding-bottom:calc(92px + env(safe-area-inset-bottom));padding-top:env(safe-area-inset-top)}
+h1,h2{font-family:"Playfair Display",Georgia,serif;margin:0;font-weight:700}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+.hero{text-align:center;padding:26px 0 6px}
+.hero .moon{font-size:40px;line-height:1}
+.hero h1{font-size:32px;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:6px}
+.hero p{color:var(--mut);margin:6px 0 0;font-size:14px}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid #ffffff14;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 32px #0007}
+.card h2{font-size:20px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:14px}
+input,select{display:block;width:100%;margin-top:6px;padding:13px 14px;border-radius:12px;border:1px solid #ffffff1f;background:#0e0e22;color:var(--txt);font:inherit;font-size:16px;appearance:none}
+input:focus,select:focus{outline:2px solid var(--gold);border-color:transparent}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:#1a1400;font:600 16px Inter,sans-serif;cursor:pointer;text-decoration:none;margin-top:4px}
+.btn.ghost{background:#ffffff12;color:var(--txt)}
+.btn.wa{background:#25d366;color:#04230f}
+.btn:disabled{opacity:.5;cursor:default}
+.btn+.btn{margin-top:10px}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;gap:6px;background:#0e0e22e6;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid #ffffff14;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.tabs button{flex:1;background:none;border:0;color:var(--mut);font:500 12px Inter,sans-serif;padding:8px 4px;border-radius:12px;cursor:pointer}
+.tabs button .ic{display:block;font-size:20px;margin-bottom:2px}
+.tabs button.on{color:var(--gold);background:#d4af3718}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.kpi{background:linear-gradient(180deg,#ffffff12,#ffffff06);border:1px solid #ffffff12;border-radius:16px;padding:16px}
+.kpi b{display:block;font-family:"Playfair Display",serif;font-size:30px;color:var(--gold2)}
+.kpi span{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #ffffff10;font-size:14px}
+.row:last-child{border-bottom:0}
+.pill{font-size:11px;padding:4px 10px;border-radius:99px;background:#ffffff14;color:var(--mut);white-space:nowrap}
+.pill.ok{background:#22c55e22;color:#86efac}
+.pill.gold{background:#d4af3726;color:var(--gold2)}
+.bar{height:7px;border-radius:99px;background:#ffffff14;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s ease}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;color:var(--gold2)}
+.hint{color:var(--mut);font-size:13px;text-align:center;margin:10px 0 0}
+.msg{padding:11px 13px;border-radius:12px;font-size:14px;margin-top:6px}
+.msg.err{background:#ef444422;color:#fca5a5}
+.msg.good{background:#22c55e22;color:#86efac}
+.ticketcard .mono{font-size:20px;text-align:center;margin:10px 0 14px}
+.camwrap{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1/1}
+.camwrap video{width:100%;height:100%;object-fit:cover}
+.frame{position:absolute;inset:16%;border:2px solid var(--gold);border-radius:20px;box-shadow:0 0 0 999px #0009}
+.result{position:fixed;inset:0;display:grid;place-items:center;background:#000b;z-index:10;padding:24px}
+.resbox{width:min(92vw,380px);border-radius:24px;padding:30px 24px;text-align:center;color:#fff;box-shadow:0 20px 60px #000a;animation:pop .25s ease}
+.resbox.ok{background:linear-gradient(160deg,#16a34a,#15803d)}
+.resbox.warn{background:linear-gradient(160deg,#f59e0b,#b45309)}
+.resbox.ko,.resbox.error{background:linear-gradient(160deg,#ef4444,#b91c1c)}
+.resbox .ico{width:64px;height:64px;margin:0 auto 12px;border-radius:50%;background:#ffffff26;display:grid;place-items:center;font-size:30px;font-weight:700}
+.resbox h2{font-size:24px;margin-bottom:8px}
+.resbox p{margin:0;opacity:.9}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+.logout{margin-top:6px}
+</style>
+</head>
+<body>
+
+<!-- CONNEXION -->
+<section id="login" class="wrap" hidden>
+  <div class="hero">
+    <div class="moon">🥂</div>
+    <h1>Coup de minuit</h1>
+    <p>31 décembre · Après la messe</p>
+  </div>
+  <form id="loginForm" class="card">
+    <h2>Accès vendeurs</h2>
+    <label>Code d'accès
+      <input id="inCode" type="password" required autocomplete="off">
+    </label>
+    <label>Votre nom
+      <input id="inVendeur" required maxlength="40" autocomplete="off" placeholder="Ex : Karim">
+    </label>
+    <button class="btn">Entrer</button>
+    <div id="loginMsg" class="msg err" hidden></div>
+  </form>
+</section>
+
+<!-- APPLICATION -->
+<main id="app" hidden>
+  <div class="wrap">
+    <div class="hero">
+      <div class="moon">🥂</div>
+      <h1>Coup de minuit</h1>
+      <p id="who"></p>
+    </div>
+
+    <!-- VENDRE -->
+    <section id="p-sell" class="panel">
+      <form id="sellForm" class="card">
+        <h2>Vendre un billet</h2>
+        <label>Nom du client
+          <input id="cNom" required maxlength="80" placeholder="Ex : Amina Benali">
+        </label>
+        <label>Numéro WhatsApp
+          <input id="cTel" inputmode="tel" required placeholder="212 6 12 34 56 78">
+        </label>
+        <label>Prix du billet (MAD)
+          <input id="cPrix" type="number" min="1" step="1" inputmode="numeric" required placeholder="Ex : 150">
+        </label>
+        <label>Nombre de billets
+          <select id="cN">
+            <option value="1">1 billet</option>
+            <option value="2">2 billets</option>
+            <option value="3">3 billets</option>
+            <option value="4">4 billets</option>
+            <option value="5">5 billets</option>
+          </select>
+        </label>
+        <button class="btn" id="sellBtn">Encaissé en espèces · Créer le billet</button>
+        <div id="sellMsg" class="msg" hidden></div>
+      </form>
+      <div id="fresh"></div>
+    </section>
+
+    <!-- TABLEAU DE BORD -->
+    <section id="p-dash" class="panel" hidden>
+      <div class="kpis" id="kpis"></div>
+      <div class="card">
+        <h2>Par vendeur</h2>
+        <div id="sellers"></div>
+      </div>
+      <div class="card">
+        <h2>Dernières ventes</h2>
+        <div id="recent"></div>
+      </div>
+      <button class="btn ghost logout" id="logout">Changer de vendeur</button>
+    </section>
+
+    <!-- SCANNER -->
+    <section id="p-scan" class="panel" hidden>
+      <div class="card" style="padding:12px">
+        <div class="camwrap">
+          <video id="vid" playsinline muted></video>
+          <canvas id="cv" hidden></canvas>
+          <div class="frame"></div>
+        </div>
+        <p id="camMsg" class="hint">Pointez la caméra vers le QR code du billet.</p>
+      </div>
+      <form id="manForm" class="card">
+        <label>Ou saisir le code manuellement
+          <input id="manCode" maxlength="16" autocomplete="off" style="text-transform:uppercase">
+        </label>
+        <button class="btn ghost">Vérifier le billet</button>
+      </form>
+    </section>
+  </div>
+
+  <nav class="tabs">
+    <button data-tab="sell" class="on"><span class="ic">🎟️</span>Vendre</button>
+    <button data-tab="dash"><span class="ic">📊</span>Tableau de bord</button>
+    <button data-tab="scan"><span class="ic">📷</span>Scanner</button>
+  </nav>
+
+  <div id="res" class="result" hidden>
+    <div class="resbox">
+      <div class="ico"></div>
+      <h2></h2>
+      <p></p>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+const EV = { name: "Coup de minuit", date: "31 décembre", place: "Après la messe" };
+
+let session = JSON.parse(localStorage.getItem("rv-session") || "null");
+const MAD = (n) => Number(n).toLocaleString("fr-FR") + " MAD";
+let fresh = [];
+let poll = null;
+let resT = null;
+
+/* ---------- API ---------- */
+async function api(action, body) {
+  const r = await fetch("/api/" + action, {
+    method: body ? "POST" : "GET",
+    headers: { "Content-Type": "application/json", "x-access-code": session?.code || "" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || "Erreur de connexion.");
+  return data;
+}
+
+/* ---------- CONNEXION ---------- */
+function showLogin() { $("#login").hidden = false; $("#app").hidden = true; }
+
+$("#loginForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const msg = $("#loginMsg");
+  msg.hidden = true;
+  session = { code: $("#inCode").value.trim(), vendeur: $("#inVendeur").value.trim() };
+  try {
+    await api("check");
+    localStorage.setItem("rv-session", JSON.stringify(session));
+    start();
+  } catch (err) {
+    session = null;
+    msg.textContent = err.message;
+    msg.hidden = false;
+  }
+};
+
+$("#logout").onclick = () => {
+  localStorage.removeItem("rv-session");
+  location.href = location.pathname;
+};
+
+function start() {
+  $("#login").hidden = true;
+  $("#app").hidden = false;
+  $("#who").textContent = `Vendeur : ${session.vendeur}`;
+  loadStats();
+  clearInterval(poll);
+  poll = setInterval(() => { if (!$("#p-dash").hidden) loadStats(); }, 5000);
+
+  // Ouverture depuis le QR code d'un billet : vérification directe
+  const v = new URLSearchParams(location.search).get("v");
+  if (v) {
+    history.replaceState(null, "", location.pathname);
+    go("scan");
+    validate(extractCode(v));
+  } else {
+    go("sell");
+  }
+}
+
+/* ---------- ONGLETS ---------- */
+function go(tab) {
+  ["sell", "dash", "scan"].forEach((t) => { $("#p-" + t).hidden = t !== tab; });
+  document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("on", b.dataset.tab === tab));
+  if (tab === "dash") loadStats();
+  if (tab === "scan") startCam(); else stopCam();
+}
+document.querySelectorAll(".tabs button").forEach((b) => (b.onclick = () => go(b.dataset.tab)));
+
+/* ---------- VENTE ---------- */
+function msg(id, text, kind) {
+  const el = $("#" + id);
+  el.textContent = text;
+  el.className = "msg " + kind;
+  el.hidden = false;
+}
+
+$("#sellForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const nom = $("#cNom").value.trim();
+  const tel = $("#cTel").value.replace(/\D/g, "");
+  const n = Number($("#cN").value);
+  const prix = Number($("#cPrix").value);
+  if (!(prix > 0)) return msg("sellMsg", "Indiquez le prix du billet.", "err");
+  const btn = $("#sellBtn");
+  btn.disabled = true;
+  btn.textContent = "Création…";
+  fresh = [];
+  try {
+    for (let i = 0; i < n; i++) {
+      const { ticket } = await api("create", { nom, tel, vendeur: session.vendeur, prix });
+      fresh.push({ ...ticket, tel });
+    }
+    renderFresh();
+    e.target.reset();
+    $("#cPrix").value = prix;
+    $("#cN").value = "1";
+    msg("sellMsg", `${n} billet${n > 1 ? "s" : ""} créé${n > 1 ? "s" : ""}. Envoyez-le${n > 1 ? "s" : ""} au client.`, "good");
+  } catch (err) {
+    msg("sellMsg", err.message, "err");
+  }
+  btn.disabled = false;
+  btn.textContent = "Encaissé en espèces · Créer le billet";
+  loadStats();
+};
+
+function renderFresh() {
+  $("#fresh").innerHTML = fresh.map((t, i) => `
+    <div class="card ticketcard">
+      <div class="row" style="border:0;padding:0">
+        <b>${esc(t.nom)}</b>
+        <span class="pill gold">Billet ${i + 1}/${fresh.length}</span>
+      </div>
+      <div class="mono">${t.code}</div>
+      <button class="btn wa" data-share="${i}">Envoyer par WhatsApp</button>
+      <button class="btn ghost" data-dl="${i}">Télécharger le PDF</button>
+    </div>`).join("");
+}
+
+$("#fresh").onclick = async (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  if (b.dataset.share !== undefined) await shareTicket(fresh[+b.dataset.share], b);
+  if (b.dataset.dl !== undefined) {
+    const blob = makeTicketPDF(fresh[+b.dataset.dl]);
+    download(blob, `billet-${fresh[+b.dataset.dl].code}.pdf`);
+  }
+};
+
+async function shareTicket(t, btn) {
+  const blob = makeTicketPDF(t);
+  const file = new File([blob], `billet-${t.code}.pdf`, { type: "application/pdf" });
+  const text = `Bonjour ${t.nom} ! 🎉 Voici votre billet pour ${EV.name} (${MAD(t.prix)}). Présentez le QR code à l'entrée. Code : ${t.code}`;
+
+  // Partage natif : le PDF part directement dans WhatsApp
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], text });
+      await api("sent", { code: t.code });
+      btn.textContent = "Envoyé ✓";
+      loadStats();
+      return;
+    } catch (err) {
+      if (err.name === "AbortError") return;
+    }
+  }
+
+  // Repli : téléchargement du PDF puis ouverture de WhatsApp
+  download(blob, file.name);
+  window.open(`https://wa.me/${t.tel}?text=${encodeURIComponent(text)}`, "_blank");
+  await api("sent", { code: t.code });
+  btn.textContent = "Envoyé ✓";
+  loadStats();
+}
+
+function download(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ---------- PDF DU BILLET ---------- */
+function qrDataUrl(text) {
+  const holder = document.createElement("div");
+  new QRCode(holder, { text, width: 480, height: 480, correctLevel: QRCode.CorrectLevel.H });
+  return holder.querySelector("canvas").toDataURL("image/png");
+}
+
+function makeTicketPDF(t) {
+  const { jsPDF } = window.jspdf;
+  const W = 210, H = 90;
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: [W, H] });
+
+  // Fond nuit et cadre doré
+  doc.setFillColor(11, 11, 26);
+  doc.rect(0, 0, W, H, "F");
+  doc.setDrawColor(212, 175, 55);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(5, 5, W - 10, H - 10, 4, 4, "S");
+
+  // Titre et infos
+  doc.setFont("times", "bold");
+  doc.setFontSize(26);
+  doc.setTextColor(212, 175, 55);
+  doc.text("COUP DE MINUIT", 14, 25);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(200, 200, 215);
+  doc.text(`${EV.date} · ${EV.place}`, 14, 33);
+
+  doc.setFontSize(8);
+  doc.setTextColor(155, 155, 180);
+  doc.text("TITULAIRE", 14, 52);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(245, 241, 230);
+  doc.text(t.nom, 14, 60);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(155, 155, 180);
+  doc.text("CODE", 14, 72);
+  doc.setFont("courier", "bold");
+  doc.setFontSize(13);
+  doc.setTextColor(243, 215, 122);
+  doc.text(t.code.match(/.{1,5}/g).join("  "), 14, 79);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(155, 155, 180);
+  doc.text(`Prix : ${t.prix} MAD`, 84, 79);
+
+  // QR code (renvoie vers la vérification du billet)
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(W - 72, 11, 60, 60, 3, 3, "F");
+  doc.addImage(qrDataUrl(`${location.origin}/?v=${t.code}`), "PNG", W - 68, 15, 52, 52);
+  doc.setFontSize(7);
+  doc.setTextColor(155, 155, 180);
+  doc.text("Scannez à l'entrée", W - 42, 80, { align: "center" });
+
+  return doc.output("blob");
+}
+
+/* ---------- TABLEAU DE BORD ---------- */
+async function loadStats() {
+  if (!session) return;
+  try { renderStats(await api("stats")); } catch (err) { /* réseau : on réessaie au prochain cycle */ }
+}
+
+function renderStats(s) {
+  const fmt = (n) => Number(n).toLocaleString("fr-FR");
+  $("#kpis").innerHTML = [
+    [fmt(s.total), "Billets vendus"],
+    [fmt(s.recettes) + " MAD", "Montant total vendu"],
+    [fmt(s.envoyes), "Billets envoyés"],
+    [fmt(s.entrees), "Entrées validées"],
+  ].map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+
+  const max = Math.max(1, ...s.vendeurs.map((v) => v.vendus));
+  $("#sellers").innerHTML = s.vendeurs.length
+    ? s.vendeurs.map((v) => `
+        <div style="padding:10px 0">
+          <div class="row" style="padding:0;border:0">
+            <b>${esc(v.vendeur)}</b>
+            <span style="color:var(--mut);font-size:13px">${v.vendus} billet${v.vendus > 1 ? "s" : ""} · ${fmt(v.recettes)} MAD</span>
+          </div>
+          <div class="bar"><i style="width:${(v.vendus / max) * 100}%"></i></div>
+        </div>`).join("")
+    : `<p class="hint">Aucune vente pour l'instant.</p>`;
+
+  $("#recent").innerHTML = s.recent.length
+    ? s.recent.map((t) => `
+        <div class="row">
+          <span>
+            ${esc(t.nom)}<br>
+            <span class="mono" style="font-size:12px">${t.code}</span><br>
+            <small style="color:var(--mut)">par ${esc(t.vendeur)} · ${fmt(t.prix)} MAD</small>
+          </span>
+          <span class="pill ${t.utilise ? "gold" : t.envoye ? "ok" : ""}">${t.utilise ? "Entré" : t.envoye ? "Envoyé" : "Vendu"}</span>
+        </div>`).join("")
+    : `<p class="hint">Aucune vente.</p>`;
+}
+
+/* ---------- SCANNER ---------- */
+let stream = null, scanning = false, busy = false, raf = null;
+
+async function startCam() {
+  if (scanning) return;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    const v = $("#vid");
+    v.srcObject = stream;
+    await v.play();
+    scanning = true;
+    $("#camMsg").textContent = "Pointez la caméra vers le QR code du billet.";
+    tick();
+  } catch (err) {
+    $("#camMsg").textContent = "Caméra indisponible : saisissez le code ci-dessous.";
+  }
+}
+
+function stopCam() {
+  scanning = false;
+  cancelAnimationFrame(raf);
+  if (stream) stream.getTracks().forEach((t) => t.stop());
+  stream = null;
+}
+
+function tick() {
+  if (!scanning) return;
+  const v = $("#vid"), c = $("#cv"), ctx = c.getContext("2d", { willReadFrequently: true });
+  if (v.readyState === v.HAVE_ENOUGH_DATA && !busy) {
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    ctx.drawImage(v, 0, 0, c.width, c.height);
+    const img = ctx.getImageData(0, 0, c.width, c.height);
+    const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+    if (code) handleScan(code.data);
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+function extractCode(raw) {
+  const text = String(raw).trim();
+  try {
+    const u = new URL(text);
+    const p = u.searchParams.get("v") || u.searchParams.get("code");
+    if (p) return p.trim().toUpperCase();
+  } catch (_) { /* pas une URL : code brut */ }
+  return text.toUpperCase();
+}
+
+async function handleScan(raw) {
+  const code = extractCode(raw);
+  if (!/^[A-Z2-9]{10}$/.test(code)) return;
+  busy = true;
+  await validate(code);
+  setTimeout(() => (busy = false), 2600);
+}
+
+async function validate(code) {
+  try {
+    const r = await api("validate", { code });
+    if (r.status === "valid") showResult("ok", "Billet authentique", r.ticket, "Entrée validée");
+    else if (r.status === "used") showResult("warn", "Billet déjà utilisé", r.ticket, "Ce billet a déjà été scanné");
+    else showResult("ko", "Billet non authentique", null, "Ce code ne correspond à aucun billet");
+  } catch (err) {
+    showResult("error", "Erreur", null, err.message);
+  }
+  loadStats();
+}
+
+function showResult(kind, title, t, sub) {
+  const r = $("#res");
+  r.hidden = false;
+  r.querySelector(".resbox").className = "resbox " + kind;
+  r.querySelector(".ico").textContent = { ok: "✓", warn: "!", ko: "✕", error: "…" }[kind];
+  r.querySelector("h2").textContent = title;
+  r.querySelector("p").innerHTML = (t ? `<b>${esc(t.nom)}</b><br>` : "") + esc(sub);
+  clearTimeout(resT);
+  resT = setTimeout(() => (r.hidden = true), 2800);
+}
+
+$("#res").onclick = () => ($("#res").hidden = true);
+
+$("#manForm").onsubmit = (e) => {
+  e.preventDefault();
+  const code = extractCode($("#manCode").value);
+  $("#manCode").value = "";
+  validate(code);
+};
+
+/* ---------- DÉMARRAGE ---------- */
+if (session?.code) {
+  api("check")
+    .then(() => start())
+    .catch(() => showLogin());
+} else {
+  showLogin();
+}
+</script>
+</body>
+</html>
