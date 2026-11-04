@@ -50,12 +50,11 @@ async function handle(event) {
     return reply(400, { error: "Requête invalide." });
   }
 
-  const store = await getStore(event);
-
-  // Vérifier le code (utilisé à la connexion)
-  if (action === "check") {
-    return reply(200, { ok: true });
-  }
+ async function getStore(event) {
+  const blobs = await import("@netlify/blobs");
+  blobs.connectLambda(event);
+  return blobs.getStore({ name: "reveillon" });
+}
 
   // Créer un billet après paiement en espèces
   if (action === "create") {
